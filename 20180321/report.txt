@@ -1,0 +1,70 @@
+Date: 21.03.2018
+Work: Introduzione alla struttura TTree, operazioni sugli elementi del Tree con processi (Selector), plot istogrammi delle distribuzioni del momento trasverso pt, pseudorapidità eta, angolo azimutale phi, particle id per leptoni, partoni, neutrini e energia mancante (MET).
+La mia analisi si concentrerà sull'energia mancante MET e come questo influisce sulle incertezze della nostra misura.
+Notes: Un TTree è una tabella ordinata di dati, costituita da rows (righe), che nel nostro caso possono essere identificate con i singoli eventi di collisione (entries). Ad ogni row corrispondono più campi, detti branches, associati alle variabili della collisione. Ad ogni branch corrispondono più leaves.
+Il nostro TTree si chiama "latino".
+Le leaves che ci interessano sono associate alle variabili di collisione e sono:
+std_vector_LHElepton_pt
+std_vector_LHElepton_eta 
+std_vector_LHElepton_phi 
+std_vector_LHElepton_id		//identifica tipo (1, 2, 3...) e carica (+/-) di una particella
+
+std_vector_LHEparton_pt		//quark e gluoni
+std_vector_LHEparton_eta 
+std_vector_LHEparton_phi 
+std_vector_LHEparton_id
+
+std_vector_LHEneutrino_pt
+std_vector_LHEneutrino_eta
+std_vector_LHEneutrino_phi
+std_vector_LHEneutrino_id
+
+Si genera un selector "mios.C" con cui operare sulle variabili di collisione. Un selector è un programma costituito da 5 funzioni:
+Begin()
+SlaveBegin()
+Process()
+SlaveTerminate()
+Terminate()
+
+Il selector agisce sul TTree lanciando il comando dalla bash di root:
+latino->Process("mios.C")
+Il Begin() viene chiamato ad ogni loop effettuato sul TTree. In questa funzione si devono dichiarare le variabili che verranno usate nell'analisi, ad esempio gli istogrammi.
+Process() è una funzione chiamata per ogni entry del TTree, in cui  vanno implementati gli algoritmi di analisi.
+Il Terminate() viene chiamato al termine di ogni loop effettuato sul TTree. In questa funzione si possono eseguire le istruzioni al termine dell'analisi, ad esempio disegnare l'istogramma o stamparlo su file.
+
+Ho creato una macro ROOT per lanciare il selettore caricando il TTree "latino". La macro si chiama macro.C e richiede come argomento in ingresso il numero di entries da elaborare. Se si vogliono elaborare tutti gli eventi contenuti nel TTree (135152 eventi) basta inserire come argomento un numero negativo. Questo è utile per testare le modifiche senza estendere l'analisi a tutti gli eventi.
+
+Ho plottato gli istogrammi per leptoni, partoni (quark), neutrini, energia mancante (MET). Ho creato 4 canvas che contengono 4 istogrammi ciascuno con la distribuzione del momento trasverso, della pseudorapidità, dell'angolo azimutale e del tipo di particelle osservate.
+Il passo successivo sarà plottare le distribuzioni riconoscendo il tipo di particella: elettroni, muoni, tauoni per i leptoni, 6 tipi di quark per i partoni. In questo modo vediamo come cambiano le distribuzioni considerando solo un tipo di particella.
+Il dubbio principale è come ottimizzare la struttura dati: ho definito 15 istogrammi TH1F e lo riempimento degli stessi è fatto su 15 righe di codice.
+C'è forse una struttura che compatta il codice e rende più fluido e leggibile l'algoritmo? Branches?
+
+Domanda fisica: a cosa è dovuto il diverso numero di particelle osservate per tipi diversi? Dipende dalla sezione d'urto associata ad un determinato decadimento?
+A cosa è dovuta la forma "maxwelliana" (?) dello spettro pt? E la pseudorapidità perché nel caso di leptoni e neutrini è centrata in 0 mentre per i partoni ho due picchi simmetrici rispetto allo 0? l'angolo di emissione dei partoni dipende dal momento del fascio protonico e quindi ha una distribuzione angolare che dipende da questo?
+La distribuzione dell'angolo azimutale è in tutti e 4 i casi assimilabile ad una distribuzione uniforme: il problema ha simmetria cilindrica.
+
+Risposta: gli eventi che sto considerando sono soggetti già ad una preselezione (E > 10 GeV, 20 GeV), questo influenza le distribuzioni delle variabili geometriche come la pseudorapidità.
+
+Gli eventi che osservo a quanta energia per fascio corrispondono? 7 TeV?
+
+LHE = formato convenzionale per scrivere gli eventi
+
+Guardare il numero di partoni e leptoni... controllare che siano 2 per evento.
+Risultato: sia partoni che leptoni non superano il numero di 2 per evento!
+
+Selezionare dati lepton togliendo tauoni dato che questi eventi sono scartati perché decadono in getti adronici ed è difficile analizzare l'evento.
+Risultato: ho selezionato gli eventi senza tauoni (id = 15), che ora non vengono considerati.
+
+Calcolare la somma vettoriale del momento trasverso dei due neutrini e plottare gli istogrammi di questa nuova osservabile. Verificare che coincidano con gli istogrammi della MET.
+Risultato: ho plottato il modulo della somma del momento trasverso e dell'angolo della somma. In entrambi i casi trovo un accordo con gli istogrammi della MET, per cui ho verificato che la MET è l'energia trasversa mancante ed è la somma delle energie dei neutrini che sfuggono dal rivelatore.
+
+Plottare istogramma delta eta jj per le coppie di partoni.
+Risultato: riesco a plottare il delta eta jj ma non il valore assoluto della differenza, ci deve essere un errore nella funzione errore assoluto.
+
+Plottare istogramma m jj per le coppie di partoni.
+Risultato: ho un dubbio su come valutare la massa invariante. Conosco l'energia delle particelle? Dovrei conoscere anche la componente z del loro momento ma ho a disposizione solo il momento trasverso.
+
+Fare una presentazione dei plot.
+
+account github amassiro
+skype	andrea.massironi
