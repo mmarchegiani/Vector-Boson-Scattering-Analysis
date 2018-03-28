@@ -50,7 +50,7 @@ Gli eventi che osservo a quanta energia per fascio corrispondono? 7 TeV?
 LHE = formato convenzionale per scrivere gli eventi
 
 Guardare il numero di partoni e leptoni... controllare che siano 2 per evento.
-Risultato: sia partoni che leptoni non superano il numero di 2 per evento!
+Risultato: sia partoni che leptoni non superano il numero di 2 per evento! Ho plottato gli istogrammi con il numero di partoni e leptoni/neutrini per evento.
 
 Selezionare dati lepton togliendo tauoni dato che questi eventi sono scartati perché decadono in getti adronici ed è difficile analizzare l'evento.
 Risultato: ho selezionato gli eventi senza tauoni (id = 15), che ora non vengono considerati.
@@ -59,10 +59,11 @@ Calcolare la somma vettoriale del momento trasverso dei due neutrini e plottare 
 Risultato: ho plottato il modulo della somma del momento trasverso e dell'angolo della somma. In entrambi i casi trovo un accordo con gli istogrammi della MET, per cui ho verificato che la MET è l'energia trasversa mancante ed è la somma delle energie dei neutrini che sfuggono dal rivelatore.
 
 Plottare istogramma delta eta jj per le coppie di partoni.
-Risultato: riesco a plottare il delta eta jj ma non il valore assoluto della differenza, ci deve essere un errore nella funzione errore assoluto.
+Risultato: ho plottato l'istogramma della ditribuzione di |deltaeta|.
 
 Plottare istogramma m jj per le coppie di partoni.
 Risultato: ho un dubbio su come valutare la massa invariante. Conosco l'energia delle particelle? Dovrei conoscere anche la componente z del loro momento ma ho a disposizione solo il momento trasverso.
+
 
 Fare una presentazione dei plot.
 

@@ -27,6 +27,8 @@ public :
    //vector<float>   *std_vector_LHEneutrino_eta;
    Float_t	   LHEneutrino_phisum;
    Float_t	   LHEneutrino_ptsum;
+   TH1F *	   _histo_leptons_per_event;
+   TH1F *	   _histo_partons_per_event;
    TH1F *	   _histo_jj_deltaeta;
    TH1F *	   _histo_jj_m;
    TH1F *	   _histo_LHEneutrino_phisum;

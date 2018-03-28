@@ -52,8 +52,10 @@ void mios::Begin(TTree * /*tree*/)
    _histo_metLHE_phi = new TH1F ("met_phi","#phi MET azimutal angle",nbins*0.1,-3.5,3.5);
    _histo_LHEneutrino_ptsum = new TH1F ("neutrino_pt_sum","p_{T} neutrinos momentum sum",nbins,0,3000.);
    _histo_LHEneutrino_phisum = new TH1F ("met_phi_sum","#phi_{sum} azimutal angle ",nbins*0.1,-3.5,3.5);
-   _histo_jj_deltaeta = new TH1F ("jj_deltaeta", "#Delta#eta_{jet-jet}", nbins*0.1, -16, +16);
+   _histo_jj_deltaeta = new TH1F ("jj_deltaeta", "#Delta#eta_{jet-jet}", nbins*0.1, 0, +16);
    _histo_jj_m = new TH1F ("jj_m", "M_{jet-jet}", nbins, -1000, +1000);
+   _histo_leptons_per_event = new TH1F ("leptons per event", "Leptoni+neutrini per evento", latino->GetEntries(), 0, latino->GetEntries());
+   _histo_partons_per_event = new TH1F ("partons per event", "Partoni per evento", latino->GetEntries(), 0, latino->GetEntries());
    TString option = GetOption();
 
 }
@@ -90,23 +92,31 @@ Bool_t mios::Process(Long64_t entry)
    GetEntry(entry);
    //std::cout << std_vector_LHElepton_pt->size() << std::endl;
    //std::cout << entry << std::endl;
-   vector<float>   *std_vector_LHEneutrino_phisum;
-   vector<float>   *std_vector_LHEneutrino_ptsum;
 
-
-   int i = 0;
-   for(int j = 0; j < std_vector_LHEparton_pt->size(); j++) {
-	if(std_vector_LHEparton_pt->at(j) >= 0. && j >= 2)
-		std::cout << "Nell'evento " << entry << " ci sono più di 2 partoni!" << std::endl;
+   int i = 0, j;
+   for(j = 0; j < std_vector_LHEparton_pt->size(); j++) {
+	//if(std_vector_LHEparton_pt->at(j) >= 0. && j >= 2)
+	if(std_vector_LHEparton_pt->at(j) >= 0.) {
+		_histo_partons_per_event->Fill(entry);
+		if(j >= 2)
+			std::cout << "Nell'evento " << entry << " ci sono più di 2 partoni!" << std::endl;
+	}
 	else {
-		if(std_vector_LHEparton_pt->at(j) < 0. && j < 2)
+		if(j < 2)
 			std::cout << "Nell'evento " << entry << " ci sono meno di 2 partoni!" << std::endl;
 	}
-
-	if(std_vector_LHElepton_pt->at(j) >= 0. && j >= 2)
-		std::cout << "Nell'evento " << entry << " ci sono più di 2 leptoni!" << std::endl;
+   }
+   for(j = 0; j < std_vector_LHElepton_pt->size(); j++) {
+	//if(std_vector_LHElepton_pt->at(j) >= 0. && j >= 2)
+	if(std_vector_LHElepton_pt->at(j) >= 0.) {
+		_histo_leptons_per_event->Fill(entry);
+		if(std_vector_LHEneutrino_pt->at(j) >= 0.)
+			_histo_leptons_per_event->Fill(entry);
+		if(j >= 2)
+			std::cout << "Nell'evento " << entry << " ci sono più di 2 leptoni!" << std::endl;
+	}
 	else {
-		if(std_vector_LHElepton_pt->at(j) < 0. && j < 2)
+		if(j < 2)
 			std::cout << "Nell'evento " << entry << " ci sono meno di 2 leptoni!" << std::endl;
 	}
    }
@@ -153,8 +163,7 @@ Bool_t mios::Process(Long64_t entry)
     	_histo_metLHE_eta->Fill(metLHEeta);
     	_histo_metLHE_phi->Fill(metLHEphi);
 
-
-	_histo_jj_deltaeta->Fill(std_vector_LHEparton_eta->at(1) - std_vector_LHEparton_eta->at(0));
+	_histo_jj_deltaeta->Fill(fabs(std_vector_LHEparton_eta->at(1) - std_vector_LHEparton_eta->at(0)));
 	//_histo_jj_m->Fill();
    }
 
@@ -248,6 +257,14 @@ void mios::Terminate()
    TCanvas* c6 = new TCanvas ("c6", "c6", 1200, 800);
    _histo_jj_deltaeta->SetFillColor(kYellow);
    _histo_jj_deltaeta->Draw();
+
+   TCanvas* c7 = new TCanvas ("c7", "c7", 1200, 800);
+   _histo_leptons_per_event->SetFillColor(kYellow);
+   _histo_leptons_per_event->Draw();
+
+   TCanvas* c8 = new TCanvas ("c8", "c8", 1200, 800);
+   _histo_partons_per_event->SetFillColor(kYellow);
+   _histo_partons_per_event->Draw();
 
    //TF1* fitfunc = new TF1 ("fitfunc","expo + gaus(2)", 0, 3000.);
    //_histo_LHElepton_pt->Fit("fitfunc", "R");
