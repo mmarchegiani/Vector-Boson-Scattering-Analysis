@@ -27,7 +27,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 
-#define nbins 10000
+#define nbins 2000
 
 void mios::Begin(TTree * /*tree*/)
 {
@@ -35,25 +35,27 @@ void mios::Begin(TTree * /*tree*/)
    // When running with PROOF Begin() is only called on the client.
    // The tree argument is deprecated (on PROOF 0 is passed).
 
-   _histo_LHElepton_pt = new TH1F ("lepton_pt","p_{T} momentum of leptons",nbins,0,3000.);
-   _histo_LHElepton_eta = new TH1F ("lepton_eta","#eta pseudorapidity of leptons",nbins*0.1,-5,5);
-   _histo_LHElepton_phi = new TH1F ("lepton_phi","#phi azimutal angle of leptons",nbins*0.1,-3.5,3.5);
+   _histo_LHElepton_pt = new TH1F ("lepton_pt","p_{T,leptons}",nbins,0,3000.);
+   _histo_LHElepton_eta = new TH1F ("lepton_eta","#eta_{leptons}",nbins*0.1,-5,5);
+   _histo_LHElepton_phi = new TH1F ("lepton_phi","#phi_{leptons}",nbins*0.1,-3.5,3.5);
    _histo_LHElepton_id = new TH1F ("lepton_id","Particle ID",36,18,18);
-   _histo_LHEparton_pt = new TH1F ("parton_pt","p_{T} momentum of partons",nbins,0,3000.);
-   _histo_LHEparton_eta = new TH1F ("parton_eta","#eta pseudorapidity of partons",nbins*0.1,-8,8);
-   _histo_LHEparton_phi = new TH1F ("parton_phi","#phi azimutal angle of partons",nbins*0.1,-3.5,3.5);
+   _histo_LHEparton_pt = new TH1F ("parton_pt","p_{T,partons}",nbins,0,3000.);
+   _histo_LHEparton_eta = new TH1F ("parton_eta","#eta_{partons}",nbins*0.1,-8,8);
+   _histo_LHEparton_phi = new TH1F ("parton_phi","#phi_{partons}",nbins*0.1,-3.5,3.5);
    _histo_LHEparton_id = new TH1F ("parton_id","Particle ID",36,-18,18);
-   _histo_LHEneutrino_pt = new TH1F ("neutrino_pt","p_{T} momentum of neutrinos",nbins,0,3000.);
-   _histo_LHEneutrino_eta = new TH1F ("neutrino_eta","#eta pseudorapidity of neutrinos",nbins*0.1,-5,5);
-   _histo_LHEneutrino_phi = new TH1F ("neutrino_phi","#phi azimutal angle of neutrinos",nbins*0.1,-3.5,3.5);
+   _histo_LHEneutrino_pt = new TH1F ("neutrino_pt","p_{T,neutrinos}",nbins,0,3000.);
+   _histo_LHEneutrino_eta = new TH1F ("neutrino_eta","#eta_{neutrinos}",nbins*0.1,-5,5);
+   _histo_LHEneutrino_phi = new TH1F ("neutrino_phi","#phi_{neutrinos}",nbins*0.1,-3.5,3.5);
    _histo_LHEneutrino_id = new TH1F ("neutrino_id","Particle ID",36,-18,18);
-   _histo_metLHE_pt = new TH1F ("met_pt","p_{T} MET",nbins,0,3000.);
-   _histo_metLHE_eta = new TH1F ("met_eta","#eta MET pseudorapidity",nbins*0.1,-5,5);
-   _histo_metLHE_phi = new TH1F ("met_phi","#phi MET azimutal angle",nbins*0.1,-3.5,3.5);
-   _histo_LHEneutrino_ptsum = new TH1F ("neutrino_pt_sum","p_{T} neutrinos momentum sum",nbins,0,3000.);
-   _histo_LHEneutrino_phisum = new TH1F ("met_phi_sum","#phi_{sum} azimutal angle ",nbins*0.1,-3.5,3.5);
+   _histo_metLHE_pt = new TH1F ("met_pt","p_{T,MET}",nbins,0,3000.);
+   _histo_metLHE_eta = new TH1F ("met_eta","#eta_{MET}",nbins*0.1,-5,5);
+   _histo_metLHE_phi = new TH1F ("met_phi","#phi_{MET}",nbins*0.1,-3.5,3.5);
+   _histo_LHEneutrino_ptsum = new TH1F ("neutrino_pt_sum","p_{T,sum}",nbins,0,3000.);
+   _histo_LHEneutrino_etasum = new TH1F ("met_eta_sum","#eta_{sum}",nbins*0.1,-5,5);
+   _histo_LHEneutrino_phisum = new TH1F ("met_phi_sum","#phi_{sum}",nbins*0.1,-3.5,3.5);
    _histo_jj_deltaeta = new TH1F ("jj_deltaeta", "#Delta#eta_{jet-jet}", nbins*0.1, 0, +16);
-   _histo_jj_m = new TH1F ("jj_m", "M_{jet-jet}", nbins, -1000, +1000);
+   _histo_jj_m = new TH1F ("jj_m", "M_{jet-jet}", nbins, 0, +3000);
+   _histo_LHEmlvlv = new TH1F ("mlvlv", "M_{l#nul#nu}", 1000, 0, +1000);
    _histo_leptons_per_event = new TH1F ("leptons per event", "Leptoni+neutrini per evento", latino->GetEntries(), 0, latino->GetEntries());
    _histo_partons_per_event = new TH1F ("partons per event", "Partoni per evento", latino->GetEntries(), 0, latino->GetEntries());
    TString option = GetOption();
@@ -93,8 +95,8 @@ Bool_t mios::Process(Long64_t entry)
    //std::cout << std_vector_LHElepton_pt->size() << std::endl;
    //std::cout << entry << std::endl;
 
-   int i = 0, j;
-   for(j = 0; j < std_vector_LHEparton_pt->size(); j++) {
+   int i = 0;
+   for(int j = 0; j < std_vector_LHEparton_pt->size(); j++) {
 	//if(std_vector_LHEparton_pt->at(j) >= 0. && j >= 2)
 	if(std_vector_LHEparton_pt->at(j) >= 0.) {
 		_histo_partons_per_event->Fill(entry);
@@ -106,7 +108,7 @@ Bool_t mios::Process(Long64_t entry)
 			std::cout << "Nell'evento " << entry << " ci sono meno di 2 partoni!" << std::endl;
 	}
    }
-   for(j = 0; j < std_vector_LHElepton_pt->size(); j++) {
+   for(int j = 0; j < std_vector_LHElepton_pt->size(); j++) {
 	//if(std_vector_LHElepton_pt->at(j) >= 0. && j >= 2)
 	if(std_vector_LHElepton_pt->at(j) >= 0.) {
 		_histo_leptons_per_event->Fill(entry);
@@ -121,50 +123,57 @@ Bool_t mios::Process(Long64_t entry)
 	}
    }
 
-   //while(std_vector_LHElepton_pt->at(i) > 0 && abs(std_vector_LHElepton_id->at(i)) != 15) {	//seleziono gli eventi senza TAUONI
-   while(std_vector_LHElepton_pt->at(i) > 0) {
-    	_histo_LHElepton_pt->Fill(std_vector_LHElepton_pt->at(i));
-    	_histo_LHElepton_eta->Fill(std_vector_LHElepton_eta->at(i));
-    	_histo_LHElepton_phi->Fill(std_vector_LHElepton_phi->at(i));
-    	_histo_LHElepton_id->Fill(std_vector_LHElepton_id->at(i));
+   Float_t pt1 = std_vector_LHEparton_pt->at(0), pt2 = std_vector_LHEparton_pt->at(1);
+   Float_t phi1 = std_vector_LHEparton_phi->at(0), phi2 = std_vector_LHEparton_phi->at(1);
+   Float_t eta1 = std_vector_LHEparton_eta->at(0), eta2 = std_vector_LHEparton_eta->at(1);
+   Float_t lepton_id1 = std_vector_LHElepton_id->at(0), lepton_id2 = std_vector_LHElepton_id->at(1);
 
-    	_histo_LHEparton_pt->Fill(std_vector_LHEparton_pt->at(i));
-    	_histo_LHEparton_eta->Fill(std_vector_LHEparton_eta->at(i));
-    	_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
-    	_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
+   if(pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15) { 	//seleziono gli eventi senza TAUONI
+	   while(i < 2) {
+	    	_histo_LHElepton_pt->Fill(std_vector_LHElepton_pt->at(i));
+	    	_histo_LHElepton_eta->Fill(std_vector_LHElepton_eta->at(i));
+	    	_histo_LHElepton_phi->Fill(std_vector_LHElepton_phi->at(i));
+	    	_histo_LHElepton_id->Fill(std_vector_LHElepton_id->at(i));
 
-    	_histo_LHEneutrino_pt->Fill(std_vector_LHEneutrino_pt->at(i));
-    	_histo_LHEneutrino_eta->Fill(std_vector_LHEneutrino_eta->at(i));
-    	_histo_LHEneutrino_phi->Fill(std_vector_LHEneutrino_phi->at(i));
-    	_histo_LHEneutrino_id->Fill(std_vector_LHEneutrino_id->at(i));
+	    	_histo_LHEparton_pt->Fill(std_vector_LHEparton_pt->at(i));
+	    	_histo_LHEparton_eta->Fill(std_vector_LHEparton_eta->at(i));
+	   	_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
+	   	_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
 
-      	//std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
-	//std::cout << i << std::endl;
-    	i++;
-  }
+	    	_histo_LHEneutrino_pt->Fill(std_vector_LHEneutrino_pt->at(i));
+	    	_histo_LHEneutrino_eta->Fill(std_vector_LHEneutrino_eta->at(i));
+	    	_histo_LHEneutrino_phi->Fill(std_vector_LHEneutrino_phi->at(i));
+	    	_histo_LHEneutrino_id->Fill(std_vector_LHEneutrino_id->at(i));
 
+	      	//std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
+		//std::cout << i << std::endl;
+	    	i++;
+	  }
 
-  //if(abs(std_vector_LHElepton_id->at(i)) != 15) {	//Seleziono gli eventi senza TAUONI
-  if(1) {
-	//LHEneutrino_phisum;
-	Float_t pt1 = std_vector_LHEneutrino_pt->at(0), pt2 = std_vector_LHEneutrino_pt->at(1);
-	Float_t phi1 = std_vector_LHEneutrino_phi->at(0), phi2 = std_vector_LHEneutrino_phi->at(1);
-	Float_t ptx = pt1*cos(phi1) + pt2*cos(phi2), pty = pt1*sin(phi1) + pt2*sin(phi2);
-	Float_t phi = phi2 - phi1;
-	LHEneutrino_ptsum = sqrt(pt1*pt1 + pt2*pt2 + 2*pt1*pt2*cos(phi));
-	LHEneutrino_phisum = atan(pty/ptx);
-	if(ptx < 0 && pty > 0)
-		LHEneutrino_phisum += 4*atan(1);
-	if(ptx < 0 && pty < 0)
-		LHEneutrino_phisum -= 4*atan(1);
-	_histo_LHEneutrino_ptsum->Fill(LHEneutrino_ptsum);
-	_histo_LHEneutrino_phisum->Fill(LHEneutrino_phisum);
+	p1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del partone a 0
+	p2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del partone a 0
+	p_tot = p1 + p2;
+	_histo_jj_deltaeta->Fill(fabs(eta2 - eta1));
+	_histo_jj_m->Fill(p_tot.M());
+
+	pt1 = std_vector_LHEneutrino_pt->at(0), pt2 = std_vector_LHEneutrino_pt->at(1);
+	phi1 = std_vector_LHEneutrino_phi->at(0), phi2 = std_vector_LHEneutrino_phi->at(1);
+	eta1 = std_vector_LHEneutrino_eta->at(0), eta2 = std_vector_LHEneutrino_eta->at(1);
+	Float_t pt3 = std_vector_LHElepton_pt->at(0), pt4 = std_vector_LHElepton_pt->at(1);
+	Float_t phi3 = std_vector_LHElepton_phi->at(0), phi4 = std_vector_LHElepton_phi->at(1);
+	Float_t eta3 = std_vector_LHElepton_eta->at(0), eta4 = std_vector_LHElepton_eta->at(1);
+	p1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del neutrino a 0
+	p2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del neutrino a 0
+	p3.SetPtEtaPhiM(pt3, eta3, phi3, 0.);		//Approssimo la massa del leptone a 0
+	p4.SetPtEtaPhiM(pt4, eta4, phi4, 0.);		//Approssimo la massa del leptone a 0
+	_histo_LHEneutrino_ptsum->Fill((p1+p2).Pt());
+	_histo_LHEneutrino_phisum->Fill((p1+p2).Phi());
+	_histo_LHEneutrino_etasum->Fill((p1+p2).PseudoRapidity());
+	_histo_LHEmlvlv->Fill((p1+p2+p3+p4).M());
 	_histo_metLHE_pt->Fill(metLHEpt);
     	_histo_metLHE_eta->Fill(metLHEeta);
     	_histo_metLHE_phi->Fill(metLHEphi);
 
-	_histo_jj_deltaeta->Fill(fabs(std_vector_LHEparton_eta->at(1) - std_vector_LHEparton_eta->at(0)));
-	//_histo_jj_m->Fill();
    }
 
    return kTRUE;
@@ -183,6 +192,8 @@ void mios::Terminate()
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
+
+   gStyle->SetOptFit(1111);
 
    TCanvas* c1 = new TCanvas ("c1", "c1", 1200, 800);
    c1->Divide(2, 2);
@@ -242,17 +253,16 @@ void mios::Terminate()
    _histo_metLHE_phi->Draw();
 
    TCanvas* c5 = new TCanvas ("c5", "c5", 1200, 800);
-   //c5->Divide(2, 2);
-   c5->Divide(2, 1);
+   c5->Divide(2, 2);
    _histo_LHEneutrino_ptsum->SetFillColor(kYellow);
-   //_histo_LHE_etasum->SetFillColor(kRed);
+   _histo_LHEneutrino_etasum->SetFillColor(kRed);
    _histo_LHEneutrino_phisum->SetFillColor(kBlue);
    c5->cd(1);
    _histo_LHEneutrino_ptsum->Draw();
    c5->cd(2);
+   _histo_LHEneutrino_etasum->Draw();
+   c5->cd(3);
    _histo_LHEneutrino_phisum->Draw();
-   //c5->cd(3);
-   //_histo_LHEneutrino_etasum->Draw();
 
    TCanvas* c6 = new TCanvas ("c6", "c6", 1200, 800);
    _histo_jj_deltaeta->SetFillColor(kYellow);
@@ -266,6 +276,15 @@ void mios::Terminate()
    _histo_partons_per_event->SetFillColor(kYellow);
    _histo_partons_per_event->Draw();
 
-   //TF1* fitfunc = new TF1 ("fitfunc","expo + gaus(2)", 0, 3000.);
-   //_histo_LHElepton_pt->Fit("fitfunc", "R");
+   TCanvas* c9 = new TCanvas ("c9", "c9", 1200, 800);
+   _histo_jj_m->SetFillColor(kYellow);
+   _histo_jj_m->Draw();
+
+   TCanvas* c10 = new TCanvas ("c10", "c10", 1200, 800);
+   _histo_LHEmlvlv->SetFillColor(kYellow);
+   _histo_LHEmlvlv->Draw();
+   TF1* fitfunc = new TF1 ("fitfunc","gaus", 124.995, 125.005);
+   fitfunc->SetParameter(1, 125.0);
+   fitfunc->SetParameter(2, 0.008);
+   _histo_LHEmlvlv->Fit("fitfunc", "R");
 }

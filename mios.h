@@ -24,15 +24,22 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
    // Declaration of leaf types
-   //vector<float>   *std_vector_LHEneutrino_eta;
-   Float_t	   LHEneutrino_phisum;
+   TLorentzVector  p1;
+   TLorentzVector  p2;
+   TLorentzVector  p3;
+   TLorentzVector  p4;
+   TLorentzVector  p_tot;
    Float_t	   LHEneutrino_ptsum;
+   Float_t	   LHEneutrino_etasum;
+   Float_t	   LHEneutrino_phisum;
    TH1F *	   _histo_leptons_per_event;
    TH1F *	   _histo_partons_per_event;
    TH1F *	   _histo_jj_deltaeta;
    TH1F *	   _histo_jj_m;
-   TH1F *	   _histo_LHEneutrino_phisum;
+   TH1F *	   _histo_LHEmlvlv;
    TH1F *	   _histo_LHEneutrino_ptsum;
+   TH1F *	   _histo_LHEneutrino_etasum;
+   TH1F *	   _histo_LHEneutrino_phisum;
    TH1F *	   _histo_LHElepton_pt;
    TH1F *	   _histo_LHElepton_eta;
    TH1F *	   _histo_LHElepton_phi;

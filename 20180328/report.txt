@@ -1,0 +1,10 @@
+Date: 28.03.2018
+Work: Creare TLorentzVector per fare operazioni cinematiche.
+Ad esempio per il calcolo del momento trasverso somma dei 2 neutrini (MET) definisco un TLorentzVector inizializzandolo con il metodo che richiede pt, eta, phi in modo che ho immediatamente il pt della somma usando i metodi della classe TLorentzVector.
+La stessa cosa la posso fare con i partoni e usare il metodo per calcolare la massa invariante della coppia di partoni.
+La distribuzione di |deltaeta| mostra che nel TTree ho anche eventi con un piccolo angolo di inclinazione rispetto all'asse z, che non ci interessano ai fini della nostra analisi dato che sono eventi che non entrano nel rivelatore.
+Applico la selezione degli eventi sulla base del valore assoluto della pseudorapidità (|eta|) dei partoni. Scelgo eventi con |eta| dei partoni < 4.7 (perché solo questi eventi entrano nel rivelatore) e con un grande momento trasverso > 30 GeV.
+
+Plottare istogramma della massa invariante della coppia di partoni.
+
+Plottare istogramma della massa invariante 2 leptoni + 2 neutrini.
