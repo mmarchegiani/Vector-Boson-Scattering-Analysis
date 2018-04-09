@@ -6,5 +6,11 @@ La distribuzione di |deltaeta| mostra che nel TTree ho anche eventi con un picco
 Applico la selezione degli eventi sulla base del valore assoluto della pseudorapidità (|eta|) dei partoni. Scelgo eventi con |eta| dei partoni < 4.7 (perché solo questi eventi entrano nel rivelatore) e con un grande momento trasverso > 30 GeV.
 
 Plottare istogramma della massa invariante della coppia di partoni.
+Risultato: l'istogramma ha un taglio a 100 GeV, dovuto alle selezioni che abbiamo fatto su pT ed eta?
+Non si evidenziano risonanze.
+
 
 Plottare istogramma della massa invariante 2 leptoni + 2 neutrini.
+Risultato: si evidenzia una risonanza a 125 GeV, come ci si aspetta dall'evento:
+H -> WW* -> lvlv
+Se osservo questo evento significa che nel mio sample ho eventi di VBS con W+W-, altrimenti non si osserverebbe l'Higgs per conservazione della carica.

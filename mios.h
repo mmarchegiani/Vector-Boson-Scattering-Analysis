@@ -24,11 +24,16 @@ public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
    // Declaration of leaf types
-   TLorentzVector  p1;
-   TLorentzVector  p2;
-   TLorentzVector  p3;
-   TLorentzVector  p4;
-   TLorentzVector  p_tot;
+   TLorentzVector  p_parton1;
+   TLorentzVector  p_parton2;
+   TLorentzVector  p_lepton1;
+   TLorentzVector  p_lepton2;
+   TLorentzVector  p_neutrino1;
+   TLorentzVector  p_neutrino2;
+   TLorentzVector  p_jj;
+   TLorentzVector  p_lvlv;
+   Float_t	   LHE_mjj;
+   Float_t	   LHE_mlvlv;
    Float_t	   LHEneutrino_ptsum;
    Float_t	   LHEneutrino_etasum;
    Float_t	   LHEneutrino_phisum;

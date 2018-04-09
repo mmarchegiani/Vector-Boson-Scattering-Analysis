@@ -123,12 +123,32 @@ Bool_t mios::Process(Long64_t entry)
 	}
    }
 
-   Float_t pt1 = std_vector_LHEparton_pt->at(0), pt2 = std_vector_LHEparton_pt->at(1);
-   Float_t phi1 = std_vector_LHEparton_phi->at(0), phi2 = std_vector_LHEparton_phi->at(1);
-   Float_t eta1 = std_vector_LHEparton_eta->at(0), eta2 = std_vector_LHEparton_eta->at(1);
    Float_t lepton_id1 = std_vector_LHElepton_id->at(0), lepton_id2 = std_vector_LHElepton_id->at(1);
 
-   if(pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15) { 	//seleziono gli eventi senza TAUONI
+   Float_t pt1 = std_vector_LHEneutrino_pt->at(0), pt2 = std_vector_LHEneutrino_pt->at(1);
+   Float_t phi1 = std_vector_LHEneutrino_phi->at(0), phi2 = std_vector_LHEneutrino_phi->at(1);
+   Float_t eta1 = std_vector_LHEneutrino_eta->at(0), eta2 = std_vector_LHEneutrino_eta->at(1);
+   p_neutrino1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del neutrino a 0
+   p_neutrino2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del neutrino a 0
+
+   pt1 = std_vector_LHElepton_pt->at(0), pt2 = std_vector_LHElepton_pt->at(1);
+   phi1 = std_vector_LHElepton_phi->at(0), phi2 = std_vector_LHElepton_phi->at(1);
+   eta1 = std_vector_LHElepton_eta->at(0), eta2 = std_vector_LHElepton_eta->at(1);
+   p_lepton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del leptone a 0
+   p_lepton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del leptone a 0
+   p_lvlv = p_neutrino1 + p_neutrino2 + p_lepton1 + p_lepton2;
+   LHE_mlvlv = p_lvlv.M();
+
+   pt1 = std_vector_LHEparton_pt->at(0), pt2 = std_vector_LHEparton_pt->at(1);
+   phi1 = std_vector_LHEparton_phi->at(0), phi2 = std_vector_LHEparton_phi->at(1);
+   eta1 = std_vector_LHEparton_eta->at(0), eta2 = std_vector_LHEparton_eta->at(1);
+   p_parton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del partone a 0
+   p_parton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del partone a 0
+   p_jj = p_parton1 + p_parton2;
+   LHE_mjj = p_jj.M();
+
+
+   if(pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15 && LHE_mlvlv > 130.) { 	//seleziono gli eventi senza TAUONI
 	   while(i < 2) {
 	    	_histo_LHElepton_pt->Fill(std_vector_LHElepton_pt->at(i));
 	    	_histo_LHElepton_eta->Fill(std_vector_LHElepton_eta->at(i));
@@ -150,26 +170,13 @@ Bool_t mios::Process(Long64_t entry)
 	    	i++;
 	  }
 
-	p1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del partone a 0
-	p2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del partone a 0
-	p_tot = p1 + p2;
 	_histo_jj_deltaeta->Fill(fabs(eta2 - eta1));
-	_histo_jj_m->Fill(p_tot.M());
+	_histo_jj_m->Fill(LHE_mjj);
 
-	pt1 = std_vector_LHEneutrino_pt->at(0), pt2 = std_vector_LHEneutrino_pt->at(1);
-	phi1 = std_vector_LHEneutrino_phi->at(0), phi2 = std_vector_LHEneutrino_phi->at(1);
-	eta1 = std_vector_LHEneutrino_eta->at(0), eta2 = std_vector_LHEneutrino_eta->at(1);
-	Float_t pt3 = std_vector_LHElepton_pt->at(0), pt4 = std_vector_LHElepton_pt->at(1);
-	Float_t phi3 = std_vector_LHElepton_phi->at(0), phi4 = std_vector_LHElepton_phi->at(1);
-	Float_t eta3 = std_vector_LHElepton_eta->at(0), eta4 = std_vector_LHElepton_eta->at(1);
-	p1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del neutrino a 0
-	p2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del neutrino a 0
-	p3.SetPtEtaPhiM(pt3, eta3, phi3, 0.);		//Approssimo la massa del leptone a 0
-	p4.SetPtEtaPhiM(pt4, eta4, phi4, 0.);		//Approssimo la massa del leptone a 0
-	_histo_LHEneutrino_ptsum->Fill((p1+p2).Pt());
-	_histo_LHEneutrino_phisum->Fill((p1+p2).Phi());
-	_histo_LHEneutrino_etasum->Fill((p1+p2).PseudoRapidity());
-	_histo_LHEmlvlv->Fill((p1+p2+p3+p4).M());
+	_histo_LHEneutrino_ptsum->Fill((p_neutrino1+p_neutrino2).Pt());
+	_histo_LHEneutrino_phisum->Fill((p_neutrino1+p_neutrino2).Phi());
+	_histo_LHEneutrino_etasum->Fill((p_neutrino1+p_neutrino2).PseudoRapidity());
+	_histo_LHEmlvlv->Fill(LHE_mlvlv);
 	_histo_metLHE_pt->Fill(metLHEpt);
     	_histo_metLHE_eta->Fill(metLHEeta);
     	_histo_metLHE_phi->Fill(metLHEphi);
