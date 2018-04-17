@@ -31,6 +31,7 @@
 #define etabins 100
 #define phibins 100
 #define mbins 1000
+TString opzioni, dir;
 
 void myselector::Begin(TTree * /*tree*/)
 {
@@ -56,6 +57,15 @@ void myselector::Begin(TTree * /*tree*/)
    _histo2_met_pt_mlvlv = new TH2F ("p_{T, MET} vs M_{l#nul#nu}", "p_{T, MET} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
    _histo2_mlvlv_t_mlvlv = new TH2F ("M^{T}_{l#nul#nu} vs M_{l#nul#nu}", "M^{T}_{l#nul#nu} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
    TString option = GetOption();
+   opzioni = option;
+   switch(opzioni){
+      case "selection":
+         dir("Selection");
+         break;
+      case "raw":
+         dir("Raw");
+         break;
+   }
 
 }
 
@@ -93,29 +103,45 @@ Bool_t myselector::Process(Long64_t entry)
    //std::cout << entry << std::endl;
 
    Float_t lepton_id1 = std_vector_LHElepton_id->at(0), lepton_id2 = std_vector_LHElepton_id->at(1);
-   Float_t pt1 = std_vector_LHElepton_pt->at(0), pt2 = std_vector_LHElepton_pt->at(1);
-   Float_t phi1 = std_vector_LHElepton_phi->at(0), phi2 = std_vector_LHElepton_phi->at(1);
-   Float_t eta1 = std_vector_LHElepton_eta->at(0), eta2 = std_vector_LHElepton_eta->at(1);
-   p_lepton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del leptone a 0
-   p_lepton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del leptone a 0
-   p_met.SetPtEtaPhiM(metLHEpt, metLHEeta, metLHEphi, 0.);
-   p_lvlv = p_met + p_lepton1 + p_lepton2;         //4-momento leptoni + neutrini
-   LHE_mlvlv = p_lvlv.M();                         //Massa invariante leptoni + neutrini
+
+   Float_t pt1 = std_vector_LHEneutrino_pt->at(0), pt2 = std_vector_LHEneutrino_pt->at(1);
+   Float_t phi1 = std_vector_LHEneutrino_phi->at(0), phi2 = std_vector_LHEneutrino_phi->at(1);
+   Float_t eta1 = std_vector_LHEneutrino_eta->at(0), eta2 = std_vector_LHEneutrino_eta->at(1);
+   p_neutrino1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);     //Approssimo la massa del neutrino a 0
+   p_neutrino2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);     //Approssimo la massa del neutrino a 0
+
+   pt1 = std_vector_LHElepton_pt->at(0), pt2 = std_vector_LHElepton_pt->at(1);
+   phi1 = std_vector_LHElepton_phi->at(0), phi2 = std_vector_LHElepton_phi->at(1);
+   eta1 = std_vector_LHElepton_eta->at(0), eta2 = std_vector_LHElepton_eta->at(1);
+   p_lepton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);    //Approssimo la massa del leptone a 0
+   p_lepton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);    //Approssimo la massa del leptone a 0
+   p_lvlv = p_neutrino1 + p_neutrino2 + p_lepton1 + p_lepton2;
+   LHE_mlvlv = p_lvlv.M();
 
    pt1 = std_vector_LHEparton_pt->at(0), pt2 = std_vector_LHEparton_pt->at(1);
    phi1 = std_vector_LHEparton_phi->at(0), phi2 = std_vector_LHEparton_phi->at(1);
    eta1 = std_vector_LHEparton_eta->at(0), eta2 = std_vector_LHEparton_eta->at(1);
-   p_parton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);		//Approssimo la massa del partone a 0
-   p_parton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);		//Approssimo la massa del partone a 0
-   p_jj = p_parton1 + p_parton2;                   //4-momento partoni
-   LHE_mjj = p_jj.M();                             //Massa invariante partoni
+   p_parton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);    //Approssimo la massa del partone a 0
+   p_parton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);    //Approssimo la massa del partone a 0
+   p_jj = p_parton1 + p_parton2;
+   LHE_mjj = p_jj.M();
 
-   p_met.SetPtEtaPhiM(metLHEpt, metLHEeta, metLHEphi, 0.);
    p_lvlv_t.SetPtEtaPhiM(p_lvlv.Pt(), 0., p_lvlv.Phi(), p_lvlv.M());
    LHE_mlvlv_t = p_lvlv_t.M();                     //Massa invariante trasversa leptoni + neutrini
 
+   Bool_t selection = 1;
+   if(opzioni == "raw") {
+      selection = 1;
+      //std::cout << selection << std::endl;
+   }
+   if(opzioni == "selection") {
+      selection = pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15 && LHE_mlvlv > 130.;
+      //std::cout << selection << " " << pt1 << " " <<  pt2 << " " << eta1 << " " << eta2 << " " << lepton_id1 << " " << lepton_id2 << " " << LHE_mlvlv << std::endl;
+   }
+
    int i = 0;
-   if(pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15 && LHE_mlvlv > 130.) { 	//seleziono gli eventi senza TAU
+   //if(pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15 && LHE_mlvlv > 130.) {   //seleziono gli eventi senza TAU
+   if(selection) {   //seleziono gli eventi a seconda del valore di selection
 	   while(i < 2) {
 	    	_histo_LHElepton_pt->Fill(std_vector_LHElepton_pt->at(i));
 	    	_histo_LHElepton_eta->Fill(std_vector_LHElepton_eta->at(i));
@@ -124,10 +150,10 @@ Bool_t myselector::Process(Long64_t entry)
 
 	    	_histo_LHEparton_pt->Fill(std_vector_LHEparton_pt->at(i));
 	    	_histo_LHEparton_eta->Fill(std_vector_LHEparton_eta->at(i));
-	   		_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
-	   		_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
+	   	_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
+	   	_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
 
-	      	//std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
+	      //std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
 			//std::cout << i << std::endl;
 	    	i++;
 	  }
@@ -136,13 +162,13 @@ Bool_t myselector::Process(Long64_t entry)
 	_histo_jj_m->Fill(LHE_mjj);                    //Riempio istogramma massa invariante jet-jet
 
    _histo2_lepton_pt_mlvlv->Fill(LHE_mlvlv, p_lepton1.Pt());   //Riempio istogrammi 2-D
-   _histo2_met_pt_mlvlv->Fill(LHE_mlvlv, p_met.Pt());
+   _histo2_met_pt_mlvlv->Fill(LHE_mlvlv, metLHEpt);
    _histo2_mlvlv_t_mlvlv->Fill(LHE_mlvlv, LHE_mlvlv_t);
 
 	_histo_LHEmlvlv->Fill(LHE_mlvlv);
 	_histo_metLHE_pt->Fill(metLHEpt);
-    _histo_metLHE_eta->Fill(metLHEeta);
-    _histo_metLHE_phi->Fill(metLHEphi);
+   _histo_metLHE_eta->Fill(metLHEeta);
+   _histo_metLHE_phi->Fill(metLHEphi);
 
    }
 
@@ -164,6 +190,7 @@ void myselector::Terminate()
    // the results graphically or save the results to file.
 
    gStyle->SetOptFit(1111);
+   TString file;
 
    TCanvas* c1 = new TCanvas ("c1", "c1", 1200, 800);
    c1->Divide(2, 2);
@@ -218,7 +245,7 @@ void myselector::Terminate()
    TCanvas* c5 = new TCanvas ("c5", "c5", 1200, 800);
    _histo_jj_m->SetFillColor(kYellow);
    _histo_jj_m->Draw();
-   c5->Print("Selection/mass_jj.png");
+   //c5->Print("Selection/mass_jj.png");
 
    TCanvas* c6 = new TCanvas ("c6", "c6", 1200, 800);
    _histo_LHEmlvlv->SetFillColor(kYellow);
