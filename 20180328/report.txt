@@ -9,8 +9,7 @@ Plottare istogramma della massa invariante della coppia di partoni.
 Risultato: l'istogramma ha un taglio a 100 GeV, dovuto alle selezioni che abbiamo fatto su pT ed eta?
 Non si evidenziano risonanze.
 
-
 Plottare istogramma della massa invariante 2 leptoni + 2 neutrini.
 Risultato: si evidenzia una risonanza a 125 GeV, come ci si aspetta dall'evento:
 H -> WW* -> lvlv
-Se osservo questo evento significa che nel mio sample ho eventi di VBS con W+W-, altrimenti non si osserverebbe l'Higgs per conservazione della carica.
+Se osservo questo evento significa che nel mio sample ho eventi di VBS con W+W-, altrimenti non si osserverebbe l'Higgs per conservazione della carica elettrica.

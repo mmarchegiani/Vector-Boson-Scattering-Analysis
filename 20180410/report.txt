@@ -1,12 +1,17 @@
 Date: 10.04.2018
-Work:
+Work: Massa invariante jj e massa invariante lvlv. Nuovo sample W+W+
 
 Plottare istogramma della massa invariante della coppia di partoni.
 Risultato: l'istogramma ha un taglio a 100 GeV, dovuto alle selezioni che abbiamo fatto su pT ed eta?
 Non si evidenziano risonanze.
-
+Il taglio a 100 GeV è hardcoded nel generatore Montecarlo per evitare di avere la risonanza della W e della Z ad 80 e 90 GeV circa.
+Non interessandoci questa risonanza, è già stata fatta una selezione in questo senso sugli eventi.
 
 Plottare istogramma della massa invariante 2 leptoni + 2 neutrini.
 Risultato: si evidenzia una risonanza a 125 GeV, come ci si aspetta dall'evento:
 H -> WW* -> lvlv
 Se osservo questo evento significa che nel mio sample ho eventi di VBS con W+W-, altrimenti non si osserverebbe l'Higgs per conservazione della carica.
+
+Analizzare il nuovo sample che contiene eventi di decadimento della coppia W+W+, carica positivamente, da cui non ci aspettiamo di osservare la risonanza dell'Higgs nel plot della m_lvlv.
+
+Plottare gli istogrammi 2-D per vedere le correlazioni.
