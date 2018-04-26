@@ -27,11 +27,12 @@
 #include <TH2.h>
 #include <TStyle.h>
 
-#define ptbins 1000
+#define ptbins 800
 #define etabins 100
 #define phibins 100
 #define mbins 1000
 TString opzioni, dir;
+unsigned int entries = 0;
 
 void myselector::Begin(TTree * /*tree*/)
 {
@@ -39,15 +40,18 @@ void myselector::Begin(TTree * /*tree*/)
    // When running with PROOF Begin() is only called on the client.
    // The tree argument is deprecated (on PROOF 0 is passed).
 
-   _histo_LHElepton_pt = new TH1F ("p_{T,lepton}","p_{T,lepton}",ptbins,0,2000.);
+   //_histo_LHElepton_pt = new TH1F ("p_{T,lepton}","p_{T,lepton}",ptbins,0,2000.);
+   _histo_LHElepton_pt = new TH1F ("p_{T,lepton}","p_{T,lepton}",ptbins,0,1000.);
    _histo_LHElepton_eta = new TH1F ("#eta_{lepton}","#eta_{lepton}",etabins,-5,5);
    _histo_LHElepton_phi = new TH1F ("#phi_{lepton}","#phi_{lepton}",phibins,-3.5,3.5);
    _histo_LHElepton_id = new TH1F ("ID_{lepton}","Particle ID",36,18,18);
-   _histo_LHEparton_pt = new TH1F ("p_{T,parton}","p_{T,parton}",ptbins,0,2000.);
+   //_histo_LHEparton_pt = new TH1F ("p_{T,parton}","p_{T,parton}",ptbins,0,2000.);
+   _histo_LHEparton_pt = new TH1F ("p_{T,parton}","p_{T,parton}",ptbins,0,200.);
    _histo_LHEparton_eta = new TH1F ("#eta_{parton}","#eta_{parton}",etabins,-8,8);
    _histo_LHEparton_phi = new TH1F ("#phi_{parton}","#phi_{parton}",phibins,-3.5,3.5);
    _histo_LHEparton_id = new TH1F ("ID_{parton}","Particle ID",36,-18,18);
-   _histo_metLHE_pt = new TH1F ("p_{T,MET}","p_{T,MET}",ptbins,0,2200.);
+   //_histo_metLHE_pt = new TH1F ("p_{T,MET}","p_{T,MET}",ptbins,0,2200.);
+   _histo_metLHE_pt = new TH1F ("p_{T,MET}","p_{T,MET}",ptbins,0,1000.);
    _histo_metLHE_eta = new TH1F ("#eta_{MET}","#eta_{MET}",etabins,-5,5);
    _histo_metLHE_phi = new TH1F ("#phi_{MET}","#phi_{MET}",phibins,-3.5,3.5);
    _histo_jj_deltaeta = new TH1F ("#Delta#eta", "#Delta#eta_{jet-jet}", etabins, 0, +10);
@@ -58,12 +62,13 @@ void myselector::Begin(TTree * /*tree*/)
    _histo2_mlvlv_t_mlvlv = new TH2F ("M^{T}_{l#nul#nu} vs M_{l#nul#nu}", "M^{T}_{l#nul#nu} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
    TString option = GetOption();
    opzioni = option;
+   
    switch(opzioni){
       case "selection":
-         dir("Selection");
+         opzioni = "Selection/";
          break;
       case "raw":
-         dir("Raw");
+         opzioni = "Raw/";
          break;
    }
 
@@ -172,6 +177,8 @@ Bool_t myselector::Process(Long64_t entry)
 
    }
 
+   entries = entry;
+
    return kTRUE;
 }
 
@@ -188,11 +195,14 @@ void myselector::Terminate()
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
-
+   
+   TStyle *th1Style = new TStyle(*gStyle);
+   th1Style->cd();
    gStyle->SetOptFit(1111);
-   TString file;
+   //TString file;
 
-   TCanvas* c1 = new TCanvas ("c1", "c1", 1200, 800);
+   //TCanvas* c1 = new TCanvas ("c1", "c1", 1200, 800);
+   TCanvas* c1 = new TCanvas ("c1", "c1", 1196, 690);
    c1->Divide(2, 2);
    _histo_LHElepton_pt->SetFillColor(kYellow);
    _histo_LHElepton_eta->SetFillColor(kRed);
@@ -206,9 +216,8 @@ void myselector::Terminate()
    _histo_LHElepton_phi->Draw();
    c1->cd(4);
    _histo_LHElepton_id->Draw();
-   //c1->Print("Selection/leptons.png");
 
-   TCanvas* c2 = new TCanvas ("c2", "c2", 1200, 800);
+   TCanvas* c2 = new TCanvas ("c2", "c2", 1196, 690);
    c2->Divide(2, 2);
    _histo_LHEparton_pt->SetFillColor(kYellow);
    _histo_LHEparton_eta->SetFillColor(kRed);
@@ -222,9 +231,8 @@ void myselector::Terminate()
    _histo_LHEparton_phi->Draw();
    c2->cd(4);
    _histo_LHEparton_id->Draw();
-   //c2->Print("Selection/partons.png");
 
-   TCanvas* c3 = new TCanvas ("c3", "c3", 1200, 800);
+   TCanvas* c3 = new TCanvas ("c3", "c3", 1196, 690);
    c3->Divide(2, 2);
    _histo_metLHE_pt->SetFillColor(kYellow);
    _histo_metLHE_eta->SetFillColor(kRed);
@@ -235,37 +243,75 @@ void myselector::Terminate()
    _histo_metLHE_eta->Draw();
    c3->cd(3);
    _histo_metLHE_phi->Draw();
-   //c3->Print("Selection/MET.png");
 
    TCanvas* c4 = new TCanvas ("c4", "c4", 1200, 800);
    _histo_jj_deltaeta->SetFillColor(kYellow);
    _histo_jj_deltaeta->Draw();
-   //c4->Print("Selection/deltaeta_jj.png");
 
    TCanvas* c5 = new TCanvas ("c5", "c5", 1200, 800);
    _histo_jj_m->SetFillColor(kYellow);
    _histo_jj_m->Draw();
-   //c5->Print("Selection/mass_jj.png");
 
    TCanvas* c6 = new TCanvas ("c6", "c6", 1200, 800);
    _histo_LHEmlvlv->SetFillColor(kYellow);
    _histo_LHEmlvlv->Draw();
-   //c6->Print("Selection/mass_lvlv.png");
    //TF1* fitfunc = new TF1 ("fitfunc","gaus", 124.995, 125.005);		//Fit della risonanza dell'Higgs
    //fitfunc->SetParameter(1, 125.0);
    //fitfunc->SetParameter(2, 0.008);
    //_histo_LHEmlvlv->Fit("fitfunc", "R");
 
+   /*TStyle *th2Style = new TStyle(*gStyle);
+   th2Style->SetStatX(0.45);
+   th2Style->SetStatY(0.45);
+   th2Style->cd();*/
+
    TCanvas* c7 = new TCanvas ("c7", "c7", 1200, 800);
    _histo2_lepton_pt_mlvlv->Draw("COLZ");
-   //c7->Print("Selection/pt_lepton1_vs_mlvlv.png");
 
    TCanvas* c8 = new TCanvas ("c8", "c8", 1200, 800);
    _histo2_met_pt_mlvlv->Draw("COLZ");
-   //c8->Print("Selection/met_pt_vs_mlvlv.png");
-
+   
    TCanvas* c9 = new TCanvas ("c9", "c9", 1200, 800);
    _histo2_mlvlv_t_mlvlv->Draw("COLZ");
-   //c9->Print("Selection/mlvlv_t_vs_mlvlv.png");
+
+   /*if(entries > 35000) {
+
+   		if(opzioni == "selection") {
+			c1->Print("Selection/leptons.png");
+   			c2->Print("Selection/partons.png");
+  	 		c3->Print("Selection/MET.png");
+  	 		c4->Print("Selection/deltaeta_jj.png");
+  	 		c5->Print("Selection/mass_jj.png");
+   			c6->Print("Selection/mass_lvlv.png");
+   			//c7->Print("Selection/pt_lepton1_vs_mlvlv.png");
+   			//c8->Print("Selection/met_pt_vs_mlvlv.png");
+			//c9->Print("Selection/mlvlv_t_vs_mlvlv.png");
+   		}
+
+   		if(opzioni == "raw") {
+			c1->Print("Raw/leptons.png");
+   			c2->Print("Raw/partons.png");
+  	 		c3->Print("Raw/MET.png");
+  	 		c4->Print("Raw/deltaeta_jj.png");
+  	 		c5->Print("Raw/mass_jj.png");
+   			c6->Print("Raw/mass_lvlv.png");
+   			//c7->Print("Raw/pt_lepton1_vs_mlvlv.png");
+   			//c8->Print("Raw/met_pt_vs_mlvlv.png");
+			//c9->Print("Raw/mlvlv_t_vs_mlvlv.png");
+  		}
+
+	}*/
+
+	if(entries > 35000) {
+		c1->Print(dir + "leptons.png");
+   		c2->Print(dir + "partons.png");
+  	 	c3->Print(dir + "MET.png");
+  	 	c4->Print(dir + "deltaeta_jj.png");
+  	 	c5->Print(dir + "mass_jj.png");
+   		c6->Print(dir + "mass_lvlv.png");
+   		//c7->Print(dir + "pt_lepton1_vs_mlvlv.png");
+   		//c8->Print(dir + "met_pt_vs_mlvlv.png");
+		//c9->Print(dir + "mlvlv_t_vs_mlvlv.png");
+	}
 
 }

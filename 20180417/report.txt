@@ -1,0 +1,29 @@
+Date: 17.04.2018
+Work: Analisi nuovi dati W+W+, TH2F vs mlvlv
+
+L'analisi del nuovo sample W+W+ non dà sorprese, differisce dal precedente solo per il numero di eventi 35000 vs 150000 (ma ne ho bisogno pochi perché ha una Xsec minore per cui mi "bastano" pochi eventi nell'analisi) e per le cariche dei bosoni vettori.
+Essendoci coppie W+W+, non potranno sicuramente derivare dal decadimento di un Higgs, per conservazione della carica.
+
+Plottare gli istogrammi 2-D per vedere le correlazioni.
+pt_lepton1 vs mlvlv
+pt_met vs mlvlv
+m_t_lvlv vs mlvlv
+
+I primi due istogrammi sono buoni, sembra esserci una distribuzione centrata su una certa coppia di valori
+(180, 50)	per 	(pt_lepton1, mlvlv)
+(200, 50)	per 	(pt_met, mlvlv)
+
+L'istogramma della massa trasversa mi lascia perplesso perché mette in evidenza una correlazione lineare "perfetta".
+Non mi convince il modo in cui ho calcolato la massa trasversa.
+Ho costruito il TLorentzVector p_lvlv_t proiettando il momento di p_lvlv in direzione ortogonale a z:
+
+p_lvlv_t.SetPtEtaPhiM(p_lvlv.Pt(), 0., p_lvlv.Phi(), p_lvlv.M());
+LHE_mlvlv_t = p_lvlv_t.M(); 
+
+dove p_lvlv è il TLorentzVector costruito con le variabili dei neutrini:
+
+p_lvlv = p_neutrino1 + p_neutrino2 + p_lepton1 + p_lepton2;
+LHE_mlvlv = p_lvlv.M();
+
+dunque sto calcolando LHE_mlvlv_t usando le variabili dei neutrini?
+La cosa non va bene dato che devo usare solo le variabili note "sperimentalmente"
