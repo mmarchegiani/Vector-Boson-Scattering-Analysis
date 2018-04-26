@@ -1,0 +1,5 @@
+Il plot degli istogrammi è fatto sulla selezione:
+|eta_j| < 4.7		Limitiamo la pseudorapidità dei getti a quella esplorata dal rivelatore
+pt > 30 GeV		Richiediamo eventi con getti ad energia trasversa superiore ai 30 GeV
+abs(lepton_id) != 15	Assenza di tauoni nell'evento
+mlvlv > 130 GeV		Richiediamo eventi che abbiano la massa invariante delle coppie leptoni + neutrini maggiore della massa dell'Higgs

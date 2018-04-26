@@ -27,10 +27,10 @@
 #include <TH2.h>
 #include <TStyle.h>
 
-#define ptbins 800
+#define ptbins 200
 #define etabins 100
 #define phibins 100
-#define mbins 1000
+#define mbins 200
 TString opzioni, dir;
 unsigned int entries = 0;
 
@@ -57,20 +57,18 @@ void myselector::Begin(TTree * /*tree*/)
    _histo_jj_deltaeta = new TH1F ("#Delta#eta", "#Delta#eta_{jet-jet}", etabins, 0, +10);
    _histo_jj_m = new TH1F ("M_{jet-jet}", "M_{jet-jet}", mbins, 0, +3500);
    _histo_LHEmlvlv = new TH1F ("M_{l#nul#nu}", "M_{l#nul#nu}", mbins, 0, +1500);
-   _histo2_lepton_pt_mlvlv = new TH2F ("p_{T, lepton1} vs M_{l#nul#nu}", "p_{T, lepton1} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
-   _histo2_met_pt_mlvlv = new TH2F ("p_{T, MET} vs M_{l#nul#nu}", "p_{T, MET} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
-   _histo2_mlvlv_t_mlvlv = new TH2F ("M^{T}_{l#nul#nu} vs M_{l#nul#nu}", "M^{T}_{l#nul#nu} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1200.);
+   _histo2_lepton_pt_mlvlv = new TH2F ("p_{T, lepton1} vs M_{l#nul#nu}", "p_{T, lepton1} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
+   _histo2_met_pt_mlvlv = new TH2F ("p_{T, MET} vs M_{l#nul#nu}", "p_{T, MET} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
+   _histo2_mlvlv_t_mlvlv = new TH2F ("M^{T}_{l#nul#nu} vs M_{l#nul#nu}", "M^{T}_{l#nul#nu} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1000.);
    TString option = GetOption();
    opzioni = option;
    
-   switch(opzioni){
-      case "selection":
-         opzioni = "Selection/";
-         break;
-      case "raw":
-         opzioni = "Raw/";
-         break;
-   }
+   if(opzioni == "selection")
+         dir = "Selection/";
+   if(opzioni == "raw")
+         dir = "Raw/";
+   if(opzioni == "test")
+   		 dir = "Test/";
 
 }
 
@@ -131,7 +129,8 @@ Bool_t myselector::Process(Long64_t entry)
    p_jj = p_parton1 + p_parton2;
    LHE_mjj = p_jj.M();
 
-   p_lvlv_t.SetPtEtaPhiM(p_lvlv.Pt(), 0., p_lvlv.Phi(), p_lvlv.M());
+   p_met.SetPtEtaPhiM(metLHEpt, metLHEeta, metLHEphi, 0.);	//Approssimo la massa invariante dei due neutrini pari a 0 poiché non la conosco!
+   p_lvlv_t.SetPtEtaPhiM((p_lepton1 + p_lepton2 + p_met).Pt(), 0., (p_lepton1 + p_lepton2 + p_met).Phi(), (p_lepton1 + p_lepton2 + p_met).M());
    LHE_mlvlv_t = p_lvlv_t.M();                     //Massa invariante trasversa leptoni + neutrini
 
    Bool_t selection = 1;
@@ -196,17 +195,23 @@ void myselector::Terminate()
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
    
+   gStyle->SetOptFit(1111);
    TStyle *th1Style = new TStyle(*gStyle);
    th1Style->cd();
-   gStyle->SetOptFit(1111);
    //TString file;
 
    //TCanvas* c1 = new TCanvas ("c1", "c1", 1200, 800);
    TCanvas* c1 = new TCanvas ("c1", "c1", 1196, 690);
    c1->Divide(2, 2);
    _histo_LHElepton_pt->SetFillColor(kYellow);
+   _histo_LHElepton_pt->GetXaxis()->SetTitle("p_{T} [GeV]");
+   _histo_LHElepton_pt->GetYaxis()->SetTitle("counts");
    _histo_LHElepton_eta->SetFillColor(kRed);
+   _histo_LHElepton_eta->GetXaxis()->SetTitle("#eta");
+   _histo_LHElepton_eta->GetYaxis()->SetTitle("counts");
    _histo_LHElepton_phi->SetFillColor(kBlue);
+   _histo_LHElepton_phi->GetXaxis()->SetTitle("#phi [rad]");
+   _histo_LHElepton_phi->GetYaxis()->SetTitle("counts");
    _histo_LHElepton_id->SetFillColor(kGreen);
    c1->cd(1);
    _histo_LHElepton_pt->Draw();
@@ -220,8 +225,14 @@ void myselector::Terminate()
    TCanvas* c2 = new TCanvas ("c2", "c2", 1196, 690);
    c2->Divide(2, 2);
    _histo_LHEparton_pt->SetFillColor(kYellow);
+   _histo_LHEparton_pt->GetXaxis()->SetTitle("p_{T} [GeV]");
+   _histo_LHEparton_pt->GetYaxis()->SetTitle("counts");
    _histo_LHEparton_eta->SetFillColor(kRed);
+   _histo_LHEparton_eta->GetXaxis()->SetTitle("#eta");
+   _histo_LHEparton_eta->GetYaxis()->SetTitle("counts");
    _histo_LHEparton_phi->SetFillColor(kBlue);
+   _histo_LHEparton_phi->GetXaxis()->SetTitle("#phi [rad]");
+   _histo_LHEparton_phi->GetYaxis()->SetTitle("counts");
    _histo_LHEparton_id->SetFillColor(kGreen);
    c2->cd(1);
    _histo_LHEparton_pt->Draw();
@@ -235,8 +246,14 @@ void myselector::Terminate()
    TCanvas* c3 = new TCanvas ("c3", "c3", 1196, 690);
    c3->Divide(2, 2);
    _histo_metLHE_pt->SetFillColor(kYellow);
+   _histo_metLHE_pt->GetXaxis()->SetTitle("p_{T} [GeV]");
+   _histo_metLHE_pt->GetYaxis()->SetTitle("counts");
    _histo_metLHE_eta->SetFillColor(kRed);
+   _histo_metLHE_eta->GetXaxis()->SetTitle("#eta");
+   _histo_metLHE_eta->GetYaxis()->SetTitle("counts");
    _histo_metLHE_phi->SetFillColor(kBlue);
+   _histo_metLHE_phi->GetXaxis()->SetTitle("#phi [rad]");
+   _histo_metLHE_phi->GetYaxis()->SetTitle("counts");
    c3->cd(1);
    _histo_metLHE_pt->Draw();
    c3->cd(2);
@@ -246,72 +263,59 @@ void myselector::Terminate()
 
    TCanvas* c4 = new TCanvas ("c4", "c4", 1200, 800);
    _histo_jj_deltaeta->SetFillColor(kYellow);
+   _histo_jj_deltaeta->GetXaxis()->SetTitle("#Delta#eta");
+   _histo_jj_deltaeta->GetYaxis()->SetTitle("counts");
    _histo_jj_deltaeta->Draw();
 
    TCanvas* c5 = new TCanvas ("c5", "c5", 1200, 800);
    _histo_jj_m->SetFillColor(kYellow);
+   _histo_jj_m->GetXaxis()->SetTitle("M_{jj} [GeV]");
+   _histo_jj_m->GetYaxis()->SetTitle("counts");
    _histo_jj_m->Draw();
 
    TCanvas* c6 = new TCanvas ("c6", "c6", 1200, 800);
    _histo_LHEmlvlv->SetFillColor(kYellow);
+   _histo_LHEmlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo_LHEmlvlv->GetYaxis()->SetTitle("counts");
    _histo_LHEmlvlv->Draw();
    //TF1* fitfunc = new TF1 ("fitfunc","gaus", 124.995, 125.005);		//Fit della risonanza dell'Higgs
    //fitfunc->SetParameter(1, 125.0);
    //fitfunc->SetParameter(2, 0.008);
    //_histo_LHEmlvlv->Fit("fitfunc", "R");
 
-   /*TStyle *th2Style = new TStyle(*gStyle);
-   th2Style->SetStatX(0.45);
-   th2Style->SetStatY(0.45);
-   th2Style->cd();*/
+	if(entries > 20000) {
+		c1->Print(dir + "leptons.png");
+   		c2->Print(dir + "partons.png");
+  		c3->Print(dir + "MET.png");
+  		c4->Print(dir + "deltaeta_jj.png");
+  		c5->Print(dir + "mass_jj.png");
+   		c6->Print(dir + "mass_lvlv.png");
+   	}
 
-   TCanvas* c7 = new TCanvas ("c7", "c7", 1200, 800);
+	TStyle *th2Style = new TStyle(*gStyle);
+   	th2Style->SetStatX(0.35);
+  	th2Style->SetStatY(0.88);
+  	th2Style->cd();
+
+   TCanvas* c7 = new TCanvas ("c7", "c7", 1196, 690);
+   _histo2_lepton_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_lepton_pt_mlvlv->GetYaxis()->SetTitle("p_{T, lepton1} [GeV]");
    _histo2_lepton_pt_mlvlv->Draw("COLZ");
 
    TCanvas* c8 = new TCanvas ("c8", "c8", 1200, 800);
+   _histo2_met_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_met_pt_mlvlv->GetYaxis()->SetTitle("p_{T, MET} [GeV]");
    _histo2_met_pt_mlvlv->Draw("COLZ");
    
    TCanvas* c9 = new TCanvas ("c9", "c9", 1200, 800);
+   _histo2_mlvlv_t_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_mlvlv_t_mlvlv->GetYaxis()->SetTitle("M^{T}_{l#nul#nu} [GeV]");
    _histo2_mlvlv_t_mlvlv->Draw("COLZ");
 
-   /*if(entries > 35000) {
-
-   		if(opzioni == "selection") {
-			c1->Print("Selection/leptons.png");
-   			c2->Print("Selection/partons.png");
-  	 		c3->Print("Selection/MET.png");
-  	 		c4->Print("Selection/deltaeta_jj.png");
-  	 		c5->Print("Selection/mass_jj.png");
-   			c6->Print("Selection/mass_lvlv.png");
-   			//c7->Print("Selection/pt_lepton1_vs_mlvlv.png");
-   			//c8->Print("Selection/met_pt_vs_mlvlv.png");
-			//c9->Print("Selection/mlvlv_t_vs_mlvlv.png");
-   		}
-
-   		if(opzioni == "raw") {
-			c1->Print("Raw/leptons.png");
-   			c2->Print("Raw/partons.png");
-  	 		c3->Print("Raw/MET.png");
-  	 		c4->Print("Raw/deltaeta_jj.png");
-  	 		c5->Print("Raw/mass_jj.png");
-   			c6->Print("Raw/mass_lvlv.png");
-   			//c7->Print("Raw/pt_lepton1_vs_mlvlv.png");
-   			//c8->Print("Raw/met_pt_vs_mlvlv.png");
-			//c9->Print("Raw/mlvlv_t_vs_mlvlv.png");
-  		}
-
-	}*/
-
-	if(entries > 35000) {
-		c1->Print(dir + "leptons.png");
-   		c2->Print(dir + "partons.png");
-  	 	c3->Print(dir + "MET.png");
-  	 	c4->Print(dir + "deltaeta_jj.png");
-  	 	c5->Print(dir + "mass_jj.png");
-   		c6->Print(dir + "mass_lvlv.png");
-   		//c7->Print(dir + "pt_lepton1_vs_mlvlv.png");
-   		//c8->Print(dir + "met_pt_vs_mlvlv.png");
-		//c9->Print(dir + "mlvlv_t_vs_mlvlv.png");
-	}
+	if(entries > 20000) {
+   		c7->Print(dir + "pt_lepton1_vs_mlvlv.png");
+   		c8->Print(dir + "met_pt_vs_mlvlv.png");
+   		c9->Print(dir + "mlvlv_t_vs_mlvlv.png");
+   	}
 
 }
