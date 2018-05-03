@@ -31,7 +31,7 @@
 #define etabins 100
 #define phibins 100
 #define mbins 200
-TString opzioni, dir;
+TString opzioni[3], dir;
 unsigned int entries = 0;
 
 void myselector::Begin(TTree * /*tree*/)
@@ -57,17 +57,33 @@ void myselector::Begin(TTree * /*tree*/)
    _histo_jj_deltaeta = new TH1F ("#Delta#eta", "#Delta#eta_{jet-jet}", etabins, 0, +10);
    _histo_jj_m = new TH1F ("M_{jet-jet}", "M_{jet-jet}", mbins, 0, +3500);
    _histo_LHEmlvlv = new TH1F ("M_{l#nul#nu}", "M_{l#nul#nu}", mbins, 0, +1500);
-   _histo2_lepton_pt_mlvlv = new TH2F ("p_{T, lepton1} vs M_{l#nul#nu}", "p_{T, lepton1} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
+   _histo2_lepton1_pt_mlvlv = new TH2F ("p_{T, lepton1} vs M_{l#nul#nu}", "p_{T, lepton1} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
+   _histo2_lepton2_pt_mlvlv = new TH2F ("p_{T, lepton2} vs M_{l#nul#nu}", "p_{T, lepton2} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
    _histo2_met_pt_mlvlv = new TH2F ("p_{T, MET} vs M_{l#nul#nu}", "p_{T, MET} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
    _histo2_mlvlv_t_mlvlv = new TH2F ("M^{T}_{l#nul#nu} vs M_{l#nul#nu}", "M^{T}_{l#nul#nu} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1000.);
-   TString option = GetOption();
-   opzioni = option;
+   _histo2_mllmet_mlvlv = new TH2F ("M_{ll, MET} vs M_{l#nul#nu}", "M_{ll, MET} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1000.);
+   _histo2_mll_mlvlv = new TH2F ("M_{ll} vs M_{l#nul#nu}", "M_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 1000.);
+   _histo2_theta_mlvlv = new TH2F ("#theta_{12} vs M_{l#nul#nu}", "#theta_{12} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
+   _histo2_dphill_mlvlv = new TH2F ("#Delta#phi_{ll} vs M_{l#nul#nu}", "#Delta#phi_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
+   _histo2_dphilmet1_mlvlv = new TH2F ("#Delta#phi_{l1,MET} vs M_{l#nul#nu}", "#Delta#phi_{l1,MET} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
+   _histo2_dphilmet2_mlvlv = new TH2F ("#Delta#phi_{l2,MET} vs M_{l#nul#nu}", "#Delta#phi_{l2,MET} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
+   _histo2_dphillxmll_mlvlv = new TH2F ("#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", "#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 2000.);
    
-   if(opzioni == "selection")
+   TString option = GetOption();
+   TObjArray *buffer = option.Tokenize(" ");
+   int i = 0;
+   while(i < buffer->GetEntries()) {
+   		 opzioni[i] = ((TObjString*)(buffer->At(i)))->String();
+		 //std::cout << i << "\t" << opzioni[i] << std::endl;
+		 i++;
+	}
+   //opzioni = option;
+   
+   if(opzioni[0] == "selection")
          dir = "Selection/";
-   if(opzioni == "raw")
+   if(opzioni[0] == "raw")
          dir = "Raw/";
-   if(opzioni == "test")
+   if(opzioni[0] == "test")
    		 dir = "Test/";
 
 }
@@ -86,8 +102,7 @@ Bool_t myselector::Process(Long64_t entry)
 {
    // The Process() function is called for each entry in the tree (or possibly
    // keyed object in the case of PROOF) to be processed. The entry argument
-   // specifies which entry in the currently loaded tree is to be processed.
-   // It can be passed to either myselector::GetEntry() or TBranch::GetEntry()
+   // specifies which entry in the currently loaded tree is to be processed.   // It can be passed to either myselector::GetEntry() or TBranch::GetEntry()
    // to read either all or the required parts of the data. When processing
    // keyed objects with PROOF, the object is already loaded and is available
    // via the fObject pointer.
@@ -112,14 +127,20 @@ Bool_t myselector::Process(Long64_t entry)
    Float_t eta1 = std_vector_LHEneutrino_eta->at(0), eta2 = std_vector_LHEneutrino_eta->at(1);
    p_neutrino1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);     //Approssimo la massa del neutrino a 0
    p_neutrino2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);     //Approssimo la massa del neutrino a 0
-
+   p_met.SetPtEtaPhiM(metLHEpt, 0., metLHEphi, 0.);	//Approssimo la massa invariante dei due neutrini pari a 0 poiché non la conosco!
+													//Metto a zero metLHEeta perché MET è una quantità trasversa e non conosco la componente z!
    pt1 = std_vector_LHElepton_pt->at(0), pt2 = std_vector_LHElepton_pt->at(1);
    phi1 = std_vector_LHElepton_phi->at(0), phi2 = std_vector_LHElepton_phi->at(1);
    eta1 = std_vector_LHElepton_eta->at(0), eta2 = std_vector_LHElepton_eta->at(1);
    p_lepton1.SetPtEtaPhiM(pt1, eta1, phi1, 0.);    //Approssimo la massa del leptone a 0
    p_lepton2.SetPtEtaPhiM(pt2, eta2, phi2, 0.);    //Approssimo la massa del leptone a 0
+   p_lepton1_t.SetPtEtaPhiM(pt1, 0., phi1, 0.);    //Approssimo la massa del leptone a 0
+   p_lepton2_t.SetPtEtaPhiM(pt2, 0., phi2, 0.);    //Approssimo la massa del leptone a 0
    p_lvlv = p_neutrino1 + p_neutrino2 + p_lepton1 + p_lepton2;
-   LHE_mlvlv = p_lvlv.M();
+   p_lvlv_t = p_lepton1_t + p_lepton2_t + p_met;
+   p_llmet = p_lepton1 + p_lepton2 + p_met;
+   p_ll = p_lepton1 + p_lepton2;
+   LHE_mlvlv = p_lvlv.M();		//variabile target
 
    pt1 = std_vector_LHEparton_pt->at(0), pt2 = std_vector_LHEparton_pt->at(1);
    phi1 = std_vector_LHEparton_phi->at(0), phi2 = std_vector_LHEparton_phi->at(1);
@@ -129,16 +150,22 @@ Bool_t myselector::Process(Long64_t entry)
    p_jj = p_parton1 + p_parton2;
    LHE_mjj = p_jj.M();
 
-   p_met.SetPtEtaPhiM(metLHEpt, metLHEeta, metLHEphi, 0.);	//Approssimo la massa invariante dei due neutrini pari a 0 poiché non la conosco!
-   p_lvlv_t.SetPtEtaPhiM((p_lepton1 + p_lepton2 + p_met).Pt(), 0., (p_lepton1 + p_lepton2 + p_met).Phi(), (p_lepton1 + p_lepton2 + p_met).M());
-   LHE_mlvlv_t = p_lvlv_t.M();                     //Massa invariante trasversa leptoni + neutrini
+   //p_lvlv_t.SetPtEtaPhiM((p_lepton1 + p_lepton2 + p_met).Pt(), 0., (p_lepton1 + p_lepton2 + p_met).Phi(), (p_lepton1 + p_lepton2 + p_met).M());
+   LHE_mlvlv_t = p_lvlv_t.M();                     //Massa invariante trasversa leptoni (non longitudinale) + neutrini
+   //p_llmet.SetPtEtaPhiM((p_lepton1 + p_lepton2 + p_met).Pt(), (p_lepton1 + p_lepton2).Eta(), (p_lepton1 + p_lepton2 + p_met).Phi(), (p_lepton1 + p_lepton2 + p_met).M());
+   LHE_mllmet = p_llmet.M();                     //Massa invariante trasversa leptoni (anche longitudinale) + neutrini
+   LHE_theta = p_lepton1.Angle(p_lepton2.Vect());	 //Angolo tra i due leptoni
+   LHE_dphill = p_lepton1_t.Angle(p_lepton2_t.Vect());
+   LHE_dphilmet1 = p_lepton1_t.Angle(p_met.Vect());
+   LHE_dphilmet2 = p_lepton2_t.Angle(p_met.Vect());
+   LHE_mll = p_ll.M();
 
    Bool_t selection = 1;
-   if(opzioni == "raw") {
+   if(opzioni[0] == "raw") {
       selection = 1;
       //std::cout << selection << std::endl;
    }
-   if(opzioni == "selection") {
+   if(opzioni[0] == "selection") {
       selection = pt1 > 30. && fabs(eta1) < 4.7 && pt2 > 30. && fabs(eta2) < 4.7 && abs(lepton_id1) != 15 && abs(lepton_id2) != 15 && LHE_mlvlv > 130.;
       //std::cout << selection << " " << pt1 << " " <<  pt2 << " " << eta1 << " " << eta2 << " " << lepton_id1 << " " << lepton_id2 << " " << LHE_mlvlv << std::endl;
    }
@@ -154,26 +181,33 @@ Bool_t myselector::Process(Long64_t entry)
 
 	    	_histo_LHEparton_pt->Fill(std_vector_LHEparton_pt->at(i));
 	    	_histo_LHEparton_eta->Fill(std_vector_LHEparton_eta->at(i));
-	   	_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
-	   	_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
+	   		_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
+	   		_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
 
-	      //std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
+	      	//std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
 			//std::cout << i << std::endl;
 	    	i++;
 	  }
 
-	_histo_jj_deltaeta->Fill(fabs(eta2 - eta1));   //Riempio istogramma deltaeta jet-jet
-	_histo_jj_m->Fill(LHE_mjj);                    //Riempio istogramma massa invariante jet-jet
-
-   _histo2_lepton_pt_mlvlv->Fill(LHE_mlvlv, p_lepton1.Pt());   //Riempio istogrammi 2-D
-   _histo2_met_pt_mlvlv->Fill(LHE_mlvlv, metLHEpt);
-   _histo2_mlvlv_t_mlvlv->Fill(LHE_mlvlv, LHE_mlvlv_t);
-
-	_histo_LHEmlvlv->Fill(LHE_mlvlv);
-	_histo_metLHE_pt->Fill(metLHEpt);
+   _histo_jj_deltaeta->Fill(fabs(eta2 - eta1));   //Riempio istogramma deltaeta jet-jet
+   _histo_jj_m->Fill(LHE_mjj);                    //Riempio istogramma massa invariante jet-jet
+   _histo_LHEmlvlv->Fill(LHE_mlvlv);
+   _histo_metLHE_pt->Fill(metLHEpt);
    _histo_metLHE_eta->Fill(metLHEeta);
    _histo_metLHE_phi->Fill(metLHEphi);
 
+   _histo2_lepton1_pt_mlvlv->Fill(LHE_mlvlv, p_lepton1.Pt());   //Riempio istogrammi 2-D
+   _histo2_lepton2_pt_mlvlv->Fill(LHE_mlvlv, p_lepton2.Pt());
+   _histo2_met_pt_mlvlv->Fill(LHE_mlvlv, metLHEpt);
+   _histo2_mlvlv_t_mlvlv->Fill(LHE_mlvlv, LHE_mlvlv_t);
+   _histo2_mllmet_mlvlv->Fill(LHE_mlvlv, LHE_mllmet);
+   _histo2_mll_mlvlv->Fill(LHE_mlvlv, LHE_mll);
+   _histo2_theta_mlvlv->Fill(LHE_mlvlv, LHE_theta);
+   _histo2_dphill_mlvlv->Fill(LHE_mlvlv, LHE_dphill);
+   _histo2_dphilmet1_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet1);
+   _histo2_dphilmet2_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet2);
+   _histo2_dphillxmll_mlvlv->Fill(LHE_mlvlv, LHE_dphill*LHE_mll);
+   
    }
 
    entries = entry;
@@ -283,7 +317,7 @@ void myselector::Terminate()
    //fitfunc->SetParameter(2, 0.008);
    //_histo_LHEmlvlv->Fit("fitfunc", "R");
 
-	if(entries > 20000) {
+	if(entries > 20000 && opzioni[2] != "corr") {
 		c1->Print(dir + "leptons.png");
    		c2->Print(dir + "partons.png");
   		c3->Print(dir + "MET.png");
@@ -291,31 +325,126 @@ void myselector::Terminate()
   		c5->Print(dir + "mass_jj.png");
    		c6->Print(dir + "mass_lvlv.png");
    	}
+   	else {
+   		c1->Close();
+   		c2->Close();
+   		c3->Close();
+   		c4->Close();
+   		c5->Close();
+   		c6->Close();
+   	}
 
 	TStyle *th2Style = new TStyle(*gStyle);
    	th2Style->SetStatX(0.35);
   	th2Style->SetStatY(0.88);
   	th2Style->cd();
+  	Option_t* draw_option = "COLZ";
+  	if(opzioni[1] == "surf")	draw_option = "SURF1";
 
    TCanvas* c7 = new TCanvas ("c7", "c7", 1196, 690);
-   _histo2_lepton_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
-   _histo2_lepton_pt_mlvlv->GetYaxis()->SetTitle("p_{T, lepton1} [GeV]");
-   _histo2_lepton_pt_mlvlv->Draw("COLZ");
+   _histo2_lepton1_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_lepton1_pt_mlvlv->GetYaxis()->SetTitle("p_{T, lepton1} [GeV]");
+   _histo2_lepton1_pt_mlvlv->Draw(draw_option);
+
+   TCanvas* c7_bis = new TCanvas ("c7_bis", "c7_bis", 1196, 690);
+   _histo2_lepton2_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_lepton2_pt_mlvlv->GetYaxis()->SetTitle("p_{T, lepton2} [GeV]");
+   _histo2_lepton2_pt_mlvlv->Draw(draw_option);
 
    TCanvas* c8 = new TCanvas ("c8", "c8", 1200, 800);
    _histo2_met_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
    _histo2_met_pt_mlvlv->GetYaxis()->SetTitle("p_{T, MET} [GeV]");
-   _histo2_met_pt_mlvlv->Draw("COLZ");
-   
+   _histo2_met_pt_mlvlv->Draw(draw_option);
+
    TCanvas* c9 = new TCanvas ("c9", "c9", 1200, 800);
    _histo2_mlvlv_t_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
    _histo2_mlvlv_t_mlvlv->GetYaxis()->SetTitle("M^{T}_{l#nul#nu} [GeV]");
-   _histo2_mlvlv_t_mlvlv->Draw("COLZ");
+   _histo2_mlvlv_t_mlvlv->Draw(draw_option);
 
-	if(entries > 20000) {
-   		c7->Print(dir + "pt_lepton1_vs_mlvlv.png");
-   		c8->Print(dir + "met_pt_vs_mlvlv.png");
-   		c9->Print(dir + "mlvlv_t_vs_mlvlv.png");
-   	}
+   TCanvas* c10 = new TCanvas ("c10", "c10", 1200, 800);
+   _histo2_mllmet_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_mllmet_mlvlv->GetYaxis()->SetTitle("M_{ll, MET} [GeV]");
+   _histo2_mllmet_mlvlv->Draw(draw_option);
+
+   TCanvas* c11 = new TCanvas ("c11", "c11", 1200, 800);
+   _histo2_mll_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_mll_mlvlv->GetYaxis()->SetTitle("M_{ll} [GeV]");
+   _histo2_mll_mlvlv->Draw(draw_option);
+
+   TCanvas* c15 = new TCanvas ("c15", "c15", 1200, 800);
+   _histo2_dphillxmll_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_dphillxmll_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{ll} M_{ll} [GeV]");
+   _histo2_dphillxmll_mlvlv->Draw(draw_option);
+
+   if(entries > 20000 && opzioni[0] == "selection") {
+   		c7->Print("Correlations/pt_lepton1_vs_mlvlv.png");		
+   		c7_bis->Print("Correlations/pt_lepton2_vs_mlvlv.png");		
+   		c8->Print("Correlations/met_pt_vs_mlvlv.png");
+   		c9->Print("Correlations/mlvlv_t_vs_mlvlv.png");
+   		c10->Print("Correlations/mllmet_vs_mlvlv.png");
+   		c11->Print("Correlations/mll_vs_mlvlv.png");
+   		c15->Print("Correlations/dphillxmll_vs_mlvlv.png");
+   }
+
+   th1Style->SetStatX(0.88);
+   th1Style->SetStatY(0.38);	
+   th1Style->cd();
+
+   TCanvas* c12 = new TCanvas ("c12", "c12", 1196, 690);
+   _histo2_theta_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_theta_mlvlv->GetYaxis()->SetTitle("#theta_{12} [rad]");
+   _histo2_theta_mlvlv->Draw(draw_option);
+
+   TCanvas* c13 = new TCanvas ("c13", "c13", 1200, 800);
+   _histo2_dphill_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_dphill_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{ll} [rad]");
+   _histo2_dphill_mlvlv->Draw(draw_option);
+
+   TCanvas* c14 = new TCanvas ("c14", "c14", 1200, 800);
+   _histo2_dphilmet1_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_dphilmet1_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{l1,MET} [rad]");
+   _histo2_dphilmet1_mlvlv->Draw(draw_option);
+
+   TCanvas* c14_bis = new TCanvas ("c14_bis", "c14_bis", 1200, 800);
+   _histo2_dphilmet2_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+   _histo2_dphilmet2_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{l2,MET} [rad]");
+   _histo2_dphilmet2_mlvlv->Draw(draw_option);
+   
+   if(entries > 20000 && opzioni[0] == "selection") {
+   		c12->Print("Correlations/theta_vs_mlvlv.png");
+   		c13->Print("Correlations/dphill_vs_mlvlv.png");
+   		c14->Print("Correlations/dphilmet1_vs_mlvlv.png");
+   		c14_bis->Print("Correlations/dphilmet2_vs_mlvlv.png");
+   }
+
+   std::ofstream output ("Correlations/correlation.txt", std::ios::out);
+
+   std::cout << "variable\tcorrelation factor" << std::endl;
+   std::cout << "pt_lepton1\t" << _histo2_lepton1_pt_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "pt_lepton2\t" << _histo2_lepton2_pt_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "met_pt\t\t" << _histo2_met_pt_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "mlvlv_t\t\t" << _histo2_mlvlv_t_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "mllmet\t\t" << _histo2_mllmet_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "mll\t\t" << _histo2_mll_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "theta\t\t" << _histo2_theta_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "dphill\t\t" << _histo2_dphill_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "dphilmet1\t" << _histo2_dphilmet1_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "dphilmet2\t" << _histo2_dphilmet2_mlvlv->GetCorrelationFactor() << std::endl;
+   std::cout << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << std::endl;
+
+   output << "variable\tcorrelation factor" << endl;
+   output << "pt_lepton1\t" << _histo2_lepton1_pt_mlvlv->GetCorrelationFactor() << endl;
+   output << "pt_lepton2\t" << _histo2_lepton2_pt_mlvlv->GetCorrelationFactor() << endl;
+   output << "met_pt\t\t" << _histo2_met_pt_mlvlv->GetCorrelationFactor() << endl;
+   output << "mlvlv_t\t\t" << _histo2_mlvlv_t_mlvlv->GetCorrelationFactor() << endl;
+   output << "mllmet\t\t" << _histo2_mllmet_mlvlv->GetCorrelationFactor() << endl;
+   output << "mll\t\t" << _histo2_mll_mlvlv->GetCorrelationFactor() << endl;
+   output << "theta\t\t" << _histo2_theta_mlvlv->GetCorrelationFactor() << endl;
+   output << "dphill\t\t" << _histo2_dphill_mlvlv->GetCorrelationFactor() << endl;
+   output << "dphilmet1\t" << _histo2_dphilmet1_mlvlv->GetCorrelationFactor() << endl;
+   output << "dphilmet2\t" << _histo2_dphilmet2_mlvlv->GetCorrelationFactor() << endl;
+   output << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << endl;
+
+   output.close();
 
 }
