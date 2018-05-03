@@ -1,0 +1,12 @@
+variable	correlation factor
+pt_lepton1	0.440843
+pt_lepton2	0.359065
+met_pt		0.323797
+mlvlv_t		0.544901
+mllmet		0.718118
+mll		0.668637
+theta		0.418884
+dphill		0.215251
+dphilmet1	-0.00738185
+dphilmet2	-0.193976
+dphill*mll	0.561934
