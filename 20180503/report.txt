@@ -1,0 +1,8 @@
+Date: 26.04.2018
+Work: Creare TTree ridotto con la variabile target e con le variabili aggiunte da me (quelle utili all'analisi).
+	  Scrivere il training per stimare la funzione mlvlv(mll, mllmet, mlvlv_t, ...) = mlvlv(parametri)
+	  Provare un metodo di MVA passando inizialmente solo 2 variabili e vedere cosa succede.
+
+Il passo successivo è prendere il TTree 'latino' e ridurlo in modo da avere un TTree con le sole variabili interessanti, più la variabile di target. Questo TTree verrà passato al training. Vedere sul link
+https://root.cern.ch/root/html/tutorials/tree/index.html
+per creare il TTree.

@@ -3,3 +3,33 @@ Work: Correlazioni tra variabili e massa invariante mlvlv,
 	  correggere massa invariante trasversa,
 	  plottare l'angolo tra i due leptoni in funzione di mlvlv
 
+Sono state scelte le seguenti variabili per testarne la correlazione con mlvlv:
+- pt_lepton1		Momento trasverso lepton1
+- pt_lepton2		Momento trasverso lepton2
+- met_pt		Momento trasverso mancante
+- mlvlv_t		Massa invariante trasversa (calcolata solo con componenti trasverse dei 4-momenti)
+- mllmet		Massa invariante leptoni + trasversa mancante (calcolata con i 4-momenti dei leptoni, e componente trasversa mancante)
+- mll			Massa invariante coppia di leptoni
+- theta			Angolo tra la coppia di leptoni
+- dphill		Delta-phi tra la coppia di leptoni
+- dphilmet1		Delta_phi tra lepton1 e met
+- dphilmet2		Delta_phi tra lepton2 e met
+- dphill*mll		Prodotto di dphill e mll per avere variabile dimensionata
+
+Sono stati calcolati i coefficienti di correlazione di ciascuna variabile con mlvlv.
+pt_lepton1	0.584854
+pt_lepton2	0.458535
+met_pt		0.468771
+mlvlv_t		0.650757
+mllmet		0.746919
+mll		0.704728
+theta		0.333938
+dphill		0.15564
+dphilmet1	0.115914
+dphilmet2	-0.168378
+
+Dall'analisi risulta che la variabile più correlata è mllmet (0.75), che d'altra parte è la variabile che più si avvicina al nostro target, mlvlv. Dopodiché seguono mll (0.70), la massa invariante dei due leptoni, e mlvlv_t (0.65), la massa invariante trasversa, calcolata con le sole componenti trasverse dei momenti. La variabile di pt dei leptoni e della met risultano debolmente correlate (~0.5), mentre le variabili angolari presentano solo una minima correlazione (~0.1-0.3).
+A lasciare un dubbio però è il comportamento in correlazione di lepton1 e lepton2, che mi aspetterei sia simile dato che è solo una convenzione che io chiami 1 il primo leptone e 2 il secondo. Il pt_lepton1 sembra essere più correlato rispetto a pt_lepton2 (+0.13). Anche i plot evidenziano comportamenti differenti, con il lepton1 che in generale è più energetico (in media 98.23 Gev vs 43...).
+Significa che il lepton1 è sempre più energetico del secondo? è dovuto ad un "hardcoding" in fase di generazione eventi?
+
+Conferma: in fase di generazione il lepton1 è quello più energetico, con pt maggiore.
