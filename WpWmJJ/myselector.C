@@ -447,4 +447,18 @@ void myselector::Terminate()
 
    output.close();
 
+   latino->SetBranchAddress("std_vector_LHElepton_pt", &std_vector_LHElepton_pt);
+   latino->SetBranchStatus("*",0);
+   latino->SetBranchStatus("std_vector_LHElepton_pt",1);
+   latino->SetName("latino_reduced");
+
+   TFile *newfile = new TFile("WpWmJJ_reduced.root","recreate");
+   TTree *newtree = latino->CloneTree();
+
+   std::cout << "Nuovo TTree salvato." << std::endl;
+   newtree->Print();
+   newfile->Write();
+   std::cout << "Lista dei contenuti del file small.root:" << std::endl;
+   newfile->ls();
+   delete newfile;
 }
