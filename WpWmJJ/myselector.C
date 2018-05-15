@@ -33,6 +33,9 @@
 #define mbins 200
 TString opzioni[3], dir;
 unsigned int entries = 0;
+ofstream firstfile("variables.dat", ios::trunc);
+firstfile.close();
+ofstream outfile("variables.dat", ios::app);
 
 void myselector::Begin(TTree * /*tree*/)
 {
@@ -181,10 +184,10 @@ Bool_t myselector::Process(Long64_t entry)
 
 	    	_histo_LHEparton_pt->Fill(std_vector_LHEparton_pt->at(i));
 	    	_histo_LHEparton_eta->Fill(std_vector_LHEparton_eta->at(i));
-	   		_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
-	   		_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
+	   	_histo_LHEparton_phi->Fill(std_vector_LHEparton_phi->at(i));
+	   	_histo_LHEparton_id->Fill(std_vector_LHEparton_id->at(i));
 
-	      	//std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
+	      //std::cout << std_vector_LHElepton_pt->at(i) << std::endl;
 			//std::cout << i << std::endl;
 	    	i++;
 	  }
@@ -207,6 +210,9 @@ Bool_t myselector::Process(Long64_t entry)
    _histo2_dphilmet1_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet1);
    _histo2_dphilmet2_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet2);
    _histo2_dphillxmll_mlvlv->Fill(LHE_mlvlv, LHE_dphill*LHE_mll);
+
+   outfile <<  LHE_mlvlv << "\t" << LHE_mlvlv_t << "\t" << LHE_mllmet << "\t" << LHE_mll;	//Salvo in un file di testo le variabili interessanti
+   outfile << LHE_theta << "\t" << LHE_dphill << "\t" << LHE_dphilmet1 << "\t" << LHE_dphilmet2 << endl;
    
    }
 
@@ -446,21 +452,23 @@ void myselector::Terminate()
    output << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << endl;
 
    output.close();
-
+   outfile.close();
    //TTree *oldtree = latino;
 
-   fChain->SetBranchAddress("std_vector_LHElepton_pt", &std_vector_LHElepton_pt);
-   fChain->SetBranchStatus("*",0);
-   fChain->SetBranchStatus("std_vector_LHElepton_pt",1);
-   fChain->SetName("latino_reduced");
+   /*fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
+   fChain->SetBranchStatus("*", 0);                          //PROVA: salvo un TTree con la sola variabile std_vector_LHElepton_pt
+   fChain->SetBranchStatus("std_vector_LHElepton_pt", 1);
+   fChain->SetBranchStatus("metLHEpt", 1);
+   fChain->SetBranchStatus("LHE_mlvlv", 1);                  //errore: unknown branch -> LHE_mlvlv
 
-   TFile *newfile = new TFile("WpWmJJ_reduced.root","recreate");
+   TFile *newfile = new TFile("WpWpJJ_reduced.root","recreate");
    TTree *newtree = fChain->CloneTree();
+   newtree->SetName("latino_reduced");
 
    std::cout << "Nuovo TTree salvato." << std::endl;
    newtree->Print();
    newfile->Write();
    std::cout << "Lista dei contenuti del file WpWmJJ_reduced.root:" << std::endl;
    newfile->ls();
-   delete newfile;
+   delete newfile;*/
 }
