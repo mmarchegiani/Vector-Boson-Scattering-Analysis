@@ -1,0 +1,32 @@
+Date: 17.05.2018
+Work: Creare un TTree nuovo nel begin con le sue variabili
+Per salvare un TTree selezionato con solo le variabili "interessanti", devo definire in myselector.h un nuovo TTree, creato come clone di fChain ma che ha solo le variabili interessanti attivate.
+
+begin:		setbranchaddress
+process:	fill (selection)
+terminate:	save and write
+
+L'operazione di salvataggio di un nuovo TTree "ridotto" è riuscita.
+Il TTree contiene solo le variabili interessanti per la MVA, cioè
+   Float_t metLHEpt;
+   vector<float> std_vector_LHElepton_pt;
+   Float_t LHE_mlvlv;
+   Float_t LHE_mlvlv_t;
+   Float_t LHE_mllmet;
+   Float_t LHE_mll;
+   Float_t LHE_theta;
+   Float_t LHE_dphill;
+   Float_t LHE_dphilmet1;
+   Float_t LHE_dphilmet2;
+
+e le entries sono solamente quelle selezionate:
+W+W-	27648 eventi	(vs 135152)
+W+W+	25775 eventi	(vs 35371)
+
+Per salvare il nuovo TTree è stato definito un puntatore a TTree in myselector.h, "fChain_selected".
+Nel Begin() del selector sono stati definiti i nuovi Branch ed è stato completato l'indirizzamento delle variabili.
+Si è aperto un nuovo TFile per evitare problemi di TTree allocati in memoria, che se aumentano di dimensioni possono crashare il programma.
+Il TTree "latino" è stato clonato vuoto in fChain_selected, che è stato riempito nel Process() solamente con gli eventi selezionati (solo i Branch interessanti). Nel Terminate() scrivo su file "WpW*JJ_reduced.root" il TTree "latino_reduced".
+Da TBrowser il TFile sembra contenere quello che ci aspettiamo, solamente le 10 variabili individuato con solamente le entries selezionate.
+
+Successivamente aggiungeremo delle altre variabili interessanti, se individuate.
