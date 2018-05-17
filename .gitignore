@@ -1,5 +1,7 @@
 *.root
 *.pdf
 *.save
+*.dat
 booleano.C
 stringhe.C
+prova.C

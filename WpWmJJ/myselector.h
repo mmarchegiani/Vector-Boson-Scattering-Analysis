@@ -21,10 +21,13 @@
 
 class myselector : public TSelector {
 public :
-   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
+   TTree          *fChain;            //!pointer to the analyzed TTree or TChain
+   TTree          *fChain_selected;   //definito da me
+
+   TFile          *treefile;           //File di destinazione del TTree
 
    // Declaration of leaf types
-   TLorentzVector  p_parton1;
+   TLorentzVector  p_parton1;          //definite da me
    TLorentzVector  p_parton2;
    TLorentzVector  p_lepton1;
    TLorentzVector  p_lepton2;
@@ -38,6 +41,7 @@ public :
    TLorentzVector  p_met;
    TLorentzVector  p_lepton1_t;
    TLorentzVector  p_lepton2_t;
+
    Float_t         LHEneutrino_ptsum;
    Float_t         LHEneutrino_etasum;
    Float_t         LHEneutrino_phisum;
@@ -50,6 +54,7 @@ public :
    Float_t         LHE_dphill;
    Float_t         LHE_dphilmet1;
    Float_t         LHE_dphilmet2;
+
    TH1F *	       _histo_leptons_per_event;
    TH1F *	       _histo_partons_per_event;
    TH1F *	       _histo_jj_deltaeta;
@@ -84,6 +89,18 @@ public :
    TH2F *          _histo2_dphilmet1_mlvlv;
    TH2F *          _histo2_dphilmet2_mlvlv;
    TH2F *          _histo2_dphillxmll_mlvlv;
+
+   vector<float>   *s_std_vector_LHElepton_pt;     //definisco le variabili di fChain_selected
+   Float_t         s_metLHEpt;
+   Float_t         s_LHE_mlvlv;
+   Float_t         s_LHE_mlvlv_t;
+   Float_t         s_LHE_mllmet;
+   Float_t         s_LHE_mll;
+   Float_t         s_LHE_theta;
+   Float_t         s_LHE_dphill;
+   Float_t         s_LHE_dphilmet1;
+   Float_t         s_LHE_dphilmet2;
+
    Float_t         GEN_weight_SM;
    Float_t         Gen_ZGstar_MomId;
    Float_t         Gen_ZGstar_MomInitStatus;
@@ -932,6 +949,23 @@ public :
    Float_t         LepSF4l__ele_mva_90p_Iso2015__Up;
 
    // List of branches
+   TBranch        *b_LHE_mlvlv;      //Branches definiti da me
+   TBranch        *b_LHE_mlvlv_t;
+   TBranch        *b_LHE_mllmet;
+   TBranch        *b_LHE_mll;
+   TBranch        *b_LHE_theta;
+   TBranch        *b_LHE_dphill;
+   TBranch        *b_LHE_dphilmet1;
+   TBranch        *b_LHE_dphilmet2;
+   /*b_LHE_mlvlv = fChain->Branch("LHE_mlvlv", &LHE_mlvlv, "LHE_mlvlv/F");           //Definisco i nuovi Branches
+   b_LHE_mlvlv_t = fChain->Branch("LHE_mlvlv_t", &LHE_mlvlv_t, "LHE_mlvlv_t/F");
+   b_LHE_mllmet = fChain->Branch("LHE_mllmet", &LHE_mllmet, "LHE_mllmet/F");
+   b_LHE_mll = fChain->Branch("LHE_mll", &LHE_mll, "LHE_mll/F");
+   b_LHE_theta = fChain->Branch("LHE_theta", &LHE_theta, "LHE_theta/F");
+   b_LHE_dphill = fChain->Branch("LHE_dphill", &LHE_dphill, "LHE_dphill/F");
+   b_LHE_dphilmet1 = fChain->Branch("LHE_dphilmet1", &LHE_dphilmet1, "LHE_dphilmet1/F");
+   b_LHE_dphilmet2 = fChain->Branch("LHE_dphilmet2", &LHE_dphilmet2, "LHE_dphilmet2/F");*/
+
    TBranch        *b_GEN_weight_SM;   //!
    TBranch        *b_Gen_ZGstar_MomId;   //!
    TBranch        *b_Gen_ZGstar_MomInitStatus;   //!
@@ -1794,6 +1828,7 @@ public :
    virtual TList  *GetOutputList() const { return fOutput; }
    virtual void    SlaveTerminate();
    virtual void    Terminate();
+   virtual void    CopyVariables();
 
    ClassDef(myselector,0);
 };
@@ -2097,6 +2132,15 @@ void myselector::Init(TTree *tree)
    if (!tree) return;
    fChain = tree;
    fChain->SetMakeClass(1);
+
+   fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv, &b_LHE_mlvlv);           //Branches aggiunti da me
+   fChain->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t, &b_LHE_mlvlv_t);
+   fChain->SetBranchAddress("LHE_mllmet", &LHE_mllmet, &b_LHE_mllmet);
+   fChain->SetBranchAddress("LHE_mll", &LHE_mll, &b_LHE_mll);
+   fChain->SetBranchAddress("LHE_theta", &LHE_theta, &b_LHE_theta);
+   fChain->SetBranchAddress("LHE_dphill", &LHE_dphill, &b_LHE_dphill);
+   fChain->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1, &b_LHE_dphilmet1);
+   fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
 
    fChain->SetBranchAddress("GEN_weight_SM", &GEN_weight_SM, &b_GEN_weight_SM);
    fChain->SetBranchAddress("Gen_ZGstar_MomId", &Gen_ZGstar_MomId, &b_Gen_ZGstar_MomId);
@@ -2955,6 +2999,20 @@ Bool_t myselector::Notify()
    // user if needed. The return value is currently not used.
 
    return kTRUE;
+}
+
+void myselector::CopyVariables() {
+   s_std_vector_LHElepton_pt = std_vector_LHElepton_pt;
+   s_metLHEpt = metLHEpt;
+   s_LHE_mlvlv = LHE_mlvlv;
+   s_LHE_mlvlv_t = LHE_mlvlv_t;
+   s_LHE_mllmet = LHE_mllmet;
+   s_LHE_mll = LHE_mll;
+   s_LHE_theta = LHE_theta;
+   s_LHE_dphill = LHE_dphill;
+   s_LHE_dphilmet1 = LHE_dphilmet1;
+   s_LHE_dphilmet2 = LHE_dphilmet2;
+
 }
 
 #endif // #ifdef myselector_cxx
