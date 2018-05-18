@@ -20,8 +20,8 @@ Il TTree contiene solo le variabili interessanti per la MVA, cioè
    Float_t LHE_dphilmet2;
 
 e le entries sono solamente quelle selezionate:
-W+W-	27648 eventi	(vs 135152)
-W+W+	25775 eventi	(vs 35371)
+W+W-	27648 eventi	(vs 135152)		2,5 MB	(vs 598 MB)
+W+W+	25775 eventi	(vs 35371)		2,4 MB	(vs 162 MB)
 
 Per salvare il nuovo TTree è stato definito un puntatore a TTree in myselector.h, "fChain_selected".
 Nel Begin() del selector sono stati definiti i nuovi Branch ed è stato completato l'indirizzamento delle variabili.
