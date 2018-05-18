@@ -957,14 +957,6 @@ public :
    TBranch        *b_LHE_dphill;
    TBranch        *b_LHE_dphilmet1;
    TBranch        *b_LHE_dphilmet2;
-   /*b_LHE_mlvlv = fChain->Branch("LHE_mlvlv", &LHE_mlvlv, "LHE_mlvlv/F");           //Definisco i nuovi Branches
-   b_LHE_mlvlv_t = fChain->Branch("LHE_mlvlv_t", &LHE_mlvlv_t, "LHE_mlvlv_t/F");
-   b_LHE_mllmet = fChain->Branch("LHE_mllmet", &LHE_mllmet, "LHE_mllmet/F");
-   b_LHE_mll = fChain->Branch("LHE_mll", &LHE_mll, "LHE_mll/F");
-   b_LHE_theta = fChain->Branch("LHE_theta", &LHE_theta, "LHE_theta/F");
-   b_LHE_dphill = fChain->Branch("LHE_dphill", &LHE_dphill, "LHE_dphill/F");
-   b_LHE_dphilmet1 = fChain->Branch("LHE_dphilmet1", &LHE_dphilmet1, "LHE_dphilmet1/F");
-   b_LHE_dphilmet2 = fChain->Branch("LHE_dphilmet2", &LHE_dphilmet2, "LHE_dphilmet2/F");*/
 
    TBranch        *b_GEN_weight_SM;   //!
    TBranch        *b_Gen_ZGstar_MomId;   //!
@@ -2132,15 +2124,6 @@ void myselector::Init(TTree *tree)
    if (!tree) return;
    fChain = tree;
    fChain->SetMakeClass(1);
-
-   fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv, &b_LHE_mlvlv);           //Branches aggiunti da me
-   fChain->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t, &b_LHE_mlvlv_t);
-   fChain->SetBranchAddress("LHE_mllmet", &LHE_mllmet, &b_LHE_mllmet);
-   fChain->SetBranchAddress("LHE_mll", &LHE_mll, &b_LHE_mll);
-   fChain->SetBranchAddress("LHE_theta", &LHE_theta, &b_LHE_theta);
-   fChain->SetBranchAddress("LHE_dphill", &LHE_dphill, &b_LHE_dphill);
-   fChain->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1, &b_LHE_dphilmet1);
-   fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
 
    fChain->SetBranchAddress("GEN_weight_SM", &GEN_weight_SM, &b_GEN_weight_SM);
    fChain->SetBranchAddress("Gen_ZGstar_MomId", &Gen_ZGstar_MomId, &b_Gen_ZGstar_MomId);

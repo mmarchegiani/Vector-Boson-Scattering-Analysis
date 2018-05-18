@@ -44,8 +44,20 @@ void myselector::Begin(TTree * /*tree*/)
    // The tree argument is deprecated (on PROOF 0 is passed).
 
    if(opzioni[2] = "tree") {
-         fChain = latino;
-         treefile = new TFile("WpWpJJ_reduced.root", "recreate");
+        fChain = latino;
+        treefile = new TFile("WpWpJJ_reduced.root", "update");
+        if(treefile->GetSize() > 2000000) {
+        	std::cout << "File WpWpJJ_reduced.root già presente. Sovrascrivere? (S/N) ";
+        	TString answer;
+        	std::cin >> answer;
+        	delete treefile;
+        	if(answer == "n" || answer == "N") {
+        		std::cout << "Interruzione operazioni di scrittura file." << std::endl;
+        		opzioni[2] = "break";
+        		return;
+        	}
+        }
+        treefile = new TFile("WpWpJJ_reduced.root", "recreate");
 
    		b_LHE_mlvlv = fChain->Branch("LHE_mlvlv", &LHE_mlvlv, "LHE_mlvlv/F");           //Definisco i nuovi Branches
    		b_LHE_mlvlv_t = fChain->Branch("LHE_mlvlv_t", &LHE_mlvlv_t, "LHE_mlvlv_t/F");
@@ -55,6 +67,15 @@ void myselector::Begin(TTree * /*tree*/)
    		b_LHE_dphill = fChain->Branch("LHE_dphill", &LHE_dphill, "LHE_dphill/F");
    		b_LHE_dphilmet1 = fChain->Branch("LHE_dphilmet1", &LHE_dphilmet1, "LHE_dphilmet1/F");
    		b_LHE_dphilmet2 = fChain->Branch("LHE_dphilmet2", &LHE_dphilmet2, "LHE_dphilmet2/F");
+
+		fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv, &b_LHE_mlvlv);           //Branches aggiunti da me
+   		fChain->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t, &b_LHE_mlvlv_t);
+   		fChain->SetBranchAddress("LHE_mllmet", &LHE_mllmet, &b_LHE_mllmet);
+   		fChain->SetBranchAddress("LHE_mll", &LHE_mll, &b_LHE_mll);
+   		fChain->SetBranchAddress("LHE_theta", &LHE_theta, &b_LHE_theta);
+   		fChain->SetBranchAddress("LHE_dphill", &LHE_dphill, &b_LHE_dphill);
+   		fChain->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1, &b_LHE_dphilmet1);
+   		fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
 
    		fChain_selected = fChain->CloneTree(0);
 
@@ -156,6 +177,8 @@ Bool_t myselector::Process(Long64_t entry)
    // Use fStatus to set the return value of TTree::Process().
    //
    // The return value is currently not used.
+   if(opzioni[2] == "break")
+   		return kFALSE;
    GetEntry(entry);
 
    //std::cout << std_vector_LHElepton_pt->size() << std::endl;
@@ -254,22 +277,9 @@ Bool_t myselector::Process(Long64_t entry)
       		//outfile << LHE_theta << "\t" << LHE_dphill << "\t" << LHE_dphilmet1 << "\t" << LHE_dphilmet2 << endl;
    	  	}
    	  	else {
-			//std::cout << "Inizio a riempire i Branches" << std::endl;
-   	   		std::cout << entry << std::endl;
+   	   		//std::cout << entry << std::endl;
    	   		myselector::CopyVariables();
    	   		fChain_selected->Fill();
-       		/*b_std_vector_LHElepton_pt->Fill();                //Riempio i Branches con le variabili lette dal file
-       		b_metLHEpt->Fill();
-       		b_LHE_mlvlv->Fill();
-       		b_LHE_mlvlv_t->Fill();
-       		b_LHE_mllmet->Fill();
-       		b_LHE_mll->Fill();
-       		b_LHE_theta->Fill();
-       		b_LHE_dphill->Fill();
-       		b_LHE_dphilmet1->Fill();
-       		b_LHE_dphilmet2->Fill();*/
-
-
    	  	}
    }
 
@@ -293,6 +303,10 @@ void myselector::Terminate()
    // the results graphically or save the results to file.
    
    if(opzioni[2] != "tree") {
+   		if(opzioni[2] == "break") {
+   			std::cout << "Terminazione del programma." << std::endl;
+   			return;
+   		}
    		gStyle->SetOptFit(1111);
    		TStyle *th1Style = new TStyle(*gStyle);
    		th1Style->cd();
