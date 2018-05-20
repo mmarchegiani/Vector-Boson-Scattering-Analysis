@@ -30,3 +30,8 @@ Il TTree "latino" è stato clonato vuoto in fChain_selected, che è stato riempi
 Da TBrowser il TFile sembra contenere quello che ci aspettiamo, solamente le 10 variabili individuato con solamente le entries selezionate.
 
 Successivamente aggiungeremo delle altre variabili interessanti, se individuate.
+
+Ora il passo successivo è eseguire il Training TMVA sul TTree selezionato.
+Fino ad ora ho programmato codice per ROOT 5.34/30. Poichè il codice che ho a disposizione è scritto per versioni successive di ROOT, il Training lo scriverò per la versione ROOT 6.13/02.
+Ho a disposizione un codice d'esempio. Incontro già dei problemi con la classe TMVA, che sembra non riconoscere alcuni metodi.
+Studio le varie classi TMVA::Tools, TMVA::Factory, TMVA::Config, TMVA::DataLoader per vedere se riesco a correggere gli errori.
