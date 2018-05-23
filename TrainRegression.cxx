@@ -18,7 +18,7 @@
 #include "TMVA/Factory.h"
 #include "TMVA/Config.h"
 //#include "TMVA/TMVAGui.h"
-#include "TMVA/DataLoader.h"
+#include "TMVA/factory.h"
 #endif
 
 //using namespace TMVA;
@@ -169,7 +169,7 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    // Apply additional cuts on the signal and background samples (can be different)
    //TCut mycut = "std_vector_lepton_pt[1] > 20"; // for example: TCut mycut = "abs(var1)<0.5 && abs(var2-0.5)<1";
 
-   // tell the factory to use all remaining events in the trees after training for testing:
+   // tell the t to use all remaining events in the trees after training for testing:
    //factory->PrepareTrainingAndTestTree( mycut, "nTrain_Regression=0:nTest_Regression=0:SplitMode=Random:NormMode=NumEvents:!V" );
 
    // If no numbers of events are given, half of the events in the tree are used 
