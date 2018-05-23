@@ -18,10 +18,9 @@
 #include "TMVA/Factory.h"
 #include "TMVA/Config.h"
 //#include "TMVA/TMVAGui.h"
-#include "TMVA/factory.h"
 #endif
 
-//using namespace TMVA;
+using namespace TMVA;
    
 void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.root" ) 
 {
