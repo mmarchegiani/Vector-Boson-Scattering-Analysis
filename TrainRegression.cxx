@@ -1,3 +1,9 @@
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TMVA Regression for Energy scale estimation
+//
+// To launch:  r00t TrainRegression.cxx\(\"BDT\"\)
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #include <cstdlib>
 #include <iostream> 
 #include <map>
@@ -159,7 +165,7 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
 
    // You can add an arbitrary number of regression trees
    dataloader->AddRegressionTree( regTree, regWeight );
-
+   std::cout << "==> Aggiunto Tree alla regressione" << std::endl;
    // This would set individual event weights (the variables defined in the 
    // expression need to exist in the original TTree)
    //dataloader->SetWeightExpression( "1", "Regression" );
@@ -182,6 +188,7 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    // it is possible to preset ranges in the option string in which the cut optimisation should be done:
    // "...:CutRangeMin[2]=-1:CutRangeMax[2]=1"...", where [2] is the third input variable
 
+   std::cout << "==> Applicazione del metodo di MVA" << std::endl;
    // PDE - RS method
    if (Use["PDERS"])
       factory->BookMethod(dataloader, TMVA::Types::kPDERS, "PDERS", "!H:!V:Normthree=T:VolumeRangeMode=Adaptive:KernelEstimator=Gauss:GaussSigma=0.3:NEventsMin=40:NEventsMax=60:VarTransform=None" );
@@ -246,7 +253,13 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=300:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=400:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
-     factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15" );
+     {
+      std::cout << "==> Esecuzione BookMethod" << std::endl;
+      factory->BookMethod( dataloader,  TMVA::Types::kBDT, "BDT",
+                           "!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30" );
+      //factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15" );
+      std::cout << "==> BookMethod eseguito" << std::endl;
+}
 //     factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=200:BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15" );
     
    if (Use["BDTG"])
@@ -258,12 +271,18 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
 
    // Train MVAs using the set of training events
    factory->TrainAllMethods();
+   std::cout << "TrainAllMethods eseguito." << std::endl;
+
 
    // ---- Evaluate all MVAs using the set of test events
    factory->TestAllMethods();
+   std::cout << "TestAllMethods eseguito." << std::endl;
+
 
    // ----- Evaluate and compare performance of all configured MVAs
-   factory->EvaluateAllMethods();    
+   factory->EvaluateAllMethods();
+   std::cout << "EvaluateAllMethods eseguito." << std::endl;
+
 
    // --------------------------------------------------------------
    
