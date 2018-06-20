@@ -17,7 +17,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
-// #include "TMVARegGui.C"
+//#include "TMVARegGui.C"
 
 #include "TMVA/Tools.h"
 #include "TMVA/Factory.h"
@@ -100,8 +100,10 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    // The second argument is the output file for the training results
    // All TMVA output can be suppressed by removing the "!" (not) in 
    // front of the "Silent" argument in the option string
+   //TMVA::Factory *factory = new TMVA::Factory( "TMVARegression", outputFile, 
+   //                                            "!V:!Silent:Color:DrawProgressBar" );
    TMVA::Factory *factory = new TMVA::Factory( "TMVARegression", outputFile, 
-                                               "!V:!Silent:Color:DrawProgressBar" );
+                                               "!V:!Silent:Color:DrawProgressBar:AnalysisType=Regression" );
 
    TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset");
 
@@ -115,9 +117,9 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
    
-   dataloader->AddVariable( "metLHEpt" , 'F');
-/*   dataloader->AddVariable( "std_vector_LHElepton_pt[0]" , 'F');
-   dataloader->AddVariable( "std_vector_LHElepton_pt[1]" , 'F');
+   //dataloader->AddVariable( "metLHEpt" , 'F');
+   //dataloader->AddVariable( "std_vector_LHElepton_pt[0]" , 'F');
+   //dataloader->AddVariable( "std_vector_LHElepton_pt[1]" , 'F');
 //    dataloader->AddVariable( "std_vector_lepton_eta[0]" , 'F');
 //    dataloader->AddVariable( "std_vector_lepton_eta[1]" , 'F');
 //    dataloader->AddVariable( "std_vector_lepton_phi[0]" , 'F');
@@ -125,18 +127,17 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    dataloader->AddVariable( "LHE_mlvlv_t" , 'F');
    dataloader->AddVariable( "LHE_mllmet" , 'F');
    dataloader->AddVariable( "LHE_mll" , 'F');
-   dataloader->AddVariable( "LHE_theta" , 'F');
-   dataloader->AddVariable( "LHE_dphill" , 'F');
-   dataloader->AddVariable( "LHE_dphill*LHE_mll" , 'F');
+   //dataloader->AddVariable( "LHE_theta" , 'F');
+   //dataloader->AddVariable( "LHE_dphill" , 'F');
+   //dataloader->AddVariable( "LHE_dphill*LHE_mll" , 'F');
 //    dataloader->AddVariable( "dphillmet" , 'F'); 
-   dataloader->AddVariable( "dphilmet1" , 'F');
-   dataloader->AddVariable( "dphilmet2" , 'F');
-   dataloader->AddVariable( "dphilmet1*mll" , 'F');
-   dataloader->AddVariable( "dphilmet2*mll" , 'F');  
+   //dataloader->AddVariable( "dphilmet1" , 'F');
+   //dataloader->AddVariable( "dphilmet2" , 'F');
+   //dataloader->AddVariable( "dphilmet1*mll" , 'F');
+   //dataloader->AddVariable( "dphilmet2*mll" , 'F');  
 //   dataloader->AddVariable( "drll" , 'F');
 //   dataloader->AddVariable( "mcoll" , 'F');
-   
- */  
+     
    
    // Add the variable carrying the regression target
    dataloader->AddTarget( "LHE_mlvlv" ); 
@@ -169,7 +170,8 @@ void TrainRegression( TString myMethodList = "", TString outfileName = "TMVAReg.
    // This would set individual event weights (the variables defined in the 
    // expression need to exist in the original TTree)
    //dataloader->SetWeightExpression( "1", "Regression" );
-   dataloader->SetWeightExpression( "metLHEpt", "Regression" );
+   //dataloader->SetWeightExpression( "metLHEpt", "Regression" );
+   dataloader->SetWeightExpression( "LHE_mlvlv < 1000.", "Regression" );
 
    // Apply additional cuts on the signal and background samples (can be different)
    //TCut mycut = "std_vector_lepton_pt[1] > 20"; // for example: TCut mycut = "abs(var1)<0.5 && abs(var2-0.5)<1";
