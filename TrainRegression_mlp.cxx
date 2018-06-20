@@ -17,7 +17,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
-// #include "TMVARegGui.C"
+#include "TMVARegGui.C"
 
 #include "TMVA/Tools.h"
 #include "TMVA/Factory.h"
@@ -135,5 +135,5 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    delete dataloader;
 
    // Launch the GUI for the root macros
-//    if (!gROOT->IsBatch()) TMVARegGui( outfileName );
+    if (!gROOT->IsBatch()) TMVARegGui( outfileName );
 }
