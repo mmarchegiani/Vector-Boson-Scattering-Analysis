@@ -106,6 +106,14 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
        "MLP", 
        "!H:!V:NeuronType=tanh:NCycles=100:HiddenLayers=N+7:TestRate=6:TrainingMethod=BFGS:Sampling=0.3:SamplingEpoch=0.8:ConvergenceImprove=1e-6:ConvergenceTests=15" 
      );
+
+   factory->BookMethod
+      (
+      dataloader,
+      TMVA::Types::kBDT,
+      "BDT",
+      "!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
         
 
    // Train MVAs using the set of training events
