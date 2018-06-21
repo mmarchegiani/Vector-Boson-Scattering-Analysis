@@ -17,7 +17,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 
-#include "TMVARegGui.C"
+//#include "TMVARegGui.C"
 
 #include "TMVA/Tools.h"
 #include "TMVA/Factory.h"
@@ -43,7 +43,6 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    (TMVA::gConfig().GetIONames()).fWeightFileDir = "weightsMassVariable0Jet";
 
    dataloader->AddVariable( "metLHEpt" , 'F');
-
    dataloader->AddVariable( "std_vector_LHElepton_pt[0]" , 'F');
    dataloader->AddVariable( "std_vector_LHElepton_pt[1]" , 'F');
    dataloader->AddVariable( "LHE_mlvlv_t" , 'F');
@@ -52,7 +51,7 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    dataloader->AddVariable( "LHE_theta" , 'F');
    dataloader->AddVariable( "LHE_dphill" , 'F');
    dataloader->AddVariable( "LHE_dphill*LHE_mll" , 'F');
-//    dataloader->AddVariable( "dphillmet" , 'F'); 
+   //dataloader->AddVariable( "dphillmet" , 'F');       //Variabile da salvare nel TTree latino_reduced
    dataloader->AddVariable( "LHE_dphilmet1" , 'F');
    dataloader->AddVariable( "LHE_dphilmet2" , 'F');
    dataloader->AddVariable( "LHE_dphilmet1*LHE_mll" , 'F');
@@ -65,8 +64,8 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    // Read training and test data (see TMVAClassification for reading ASCII files)
    // load the signal and background event samples from ROOT trees
    TFile *input(0);
-   //TString fname = "./WpWmJJ/WpWmJJ_reduced.root";
-   TString fname = "./WpWpJJ/WpWpJJ_reduced.root";
+   TString fname = "./WpWmJJ/WpWmJJ_reduced.root";
+   //TString fname = "./WpWpJJ/WpWpJJ_reduced.root";
    
    if (!gSystem->AccessPathName( fname )) 
       input = TFile::Open( fname ); // check if file in local directory exists
@@ -87,7 +86,14 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    std::cout << "==> Aggiunto Tree alla regressione" << std::endl;
    // This would set individual event weights (the variables defined in the 
    // expression need to exist in the original TTree)
-   dataloader->SetWeightExpression( "1", "Regression" );
+   //dataloader->SetWeightExpression( "LHE_mlvlv<1000.", "Regression" );      //non funziona
+
+   // Apply additional cuts on the signal and background samples (can be different)
+   //TCut mycut = "LHE_mlvlv > 160. && LHE_mlvlv < 1000.";
+   TCut mycut = "LHE_mlvlv > 160. && LHE_mlvlv < 1000.";
+   // If no numbers of events are given, half of the events in the tree are used 
+   // for training, and the other half for testing:
+   dataloader->PrepareTrainingAndTestTree( mycut, "SplitMode=random:!V" );
    
    // Neural network (MLP)
 
@@ -99,20 +105,33 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
 // 	factory->BookMethod(dataloader, TMVA::Types::kMLP, "MLP", "!H:!V:VarTransform=G,N:NeuronType=tanh:NCycles=100:HiddenLayers=N+5:TestRate=6:TrainingMethod=BFGS:Sampling=0.3:SamplingEpoch=0.8:ConvergenceImprove=1e-6:ConvergenceTests=15" );
 //      factory->BookMethod(dataloader, TMVA::Types::kMLP, "MLP", "!H:!V:VarTransform=G,N:NeuronType=tanh:NCycles=200:HiddenLayers=N+7:TestRate=6:TrainingMethod=BFGS:Sampling=0.3:SamplingEpoch=0.8:ConvergenceImprove=1e-6:ConvergenceTests=15" );
 //      factory->BookMethod(dataloader, TMVA::Types::kMLP, "MLP", "!H:!V:NeuronType=tanh:NCycles=400:HiddenLayers=N+7:TestRate=6:TrainingMethod=BFGS:Sampling=0.3:SamplingEpoch=0.8:ConvergenceImprove=1e-6:ConvergenceTests=15" );
-   factory->BookMethod
+/*   factory->BookMethod
      (
        dataloader, 
        TMVA::Types::kMLP, 
        "MLP", 
        "!H:!V:NeuronType=tanh:NCycles=100:HiddenLayers=N+7:TestRate=6:TrainingMethod=BFGS:Sampling=0.3:SamplingEpoch=0.8:ConvergenceImprove=1e-6:ConvergenceTests=15" 
      );
+*/
+
+   // Boosted Decision Trees
+
+//      factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=100:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30" );
+//         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=200:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=300:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//    factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=100:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//    factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:VarTransform=G,N:NTrees=100:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=300:nEventsMin=5:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=400:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
+//         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 
    factory->BookMethod
       (
       dataloader,
       TMVA::Types::kBDT,
       "BDT",
-      "!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      "!H:!V:NTrees=500:MinNodeSize=2.5%:BoostType=AdaBoost:AdaBoostBeta=0.25:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
         
 
