@@ -225,9 +225,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    TStopwatch sw;
    sw.Start();
    for (Long64_t ievt=0; ievt<newtree->GetEntries();ievt++) {
-      if (ievt%1000 == 0) {
+      //if (ievt%1000 == 0) {
          std::cout << "--- ... Processing event: " << ievt << std::endl;
-      }
+      //}
       newtree->GetEntry(ievt);
       // Retrieve the MVA target values (regression outputs) and fill into histograms
       // NOTE: EvaluateRegression(..) returns a vector for multi-target regression
@@ -242,7 +242,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       Float_t y_plots[3] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
       for (Int_t ih=0; ih<nplots; ih++) {
       	plots[ih]->Fill(LHE_mlvlv, y_plots[ih]);
+      	std::cout << "Fill 1 eseguito" << std::endl;
       	plots[ih + nvariables]->Fill(LHE_mlvlv, (y_plots[ih] - LHE_mlvlv)/LHE_mlvlv);
+      	std::cout << "Fill 2 eseguito" << std::endl;
       }
 
    }
