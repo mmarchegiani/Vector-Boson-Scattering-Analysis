@@ -3,6 +3,7 @@
 *.save
 *.dat
 dataset/*
+plots/*
 booleano.C
 stringhe.C
 prova.C
