@@ -145,7 +145,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       // - (variabile - target) : target vs target
       if (it->second) {
       for(nplots = 0; nplots < nvariables; nplots++) {
-      	plots[nplots] = new TH2F("Plot_{1} " + TString(it->first) + " method",
+      	plots[nplots] = new TH2F("Plot_{1} " + variable_name[nplots] + TString(it->first) + " method",
       							   variable_name[nplots] + " vs " + target_name,
       							   mbins,
       							   0.,
@@ -155,7 +155,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       							   1000.
       					);
       	
-      	plots[nplots + nvariables] = new TH2F("Plot_{2} " + TString(it->first) + " method",
+      	plots[nplots + nvariables] = new TH2F("Plot_{2} " + variable_name[nplots] + TString(it->first) + " method",
       							   "(" + variable_name[nplots] + " - " + target_name + ") : " + target_name + " vs " + target_name,
       							   mbins,
       							   0.,
@@ -238,9 +238,11 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
          b_REG_mlvlv->Fill(); 
          hists[ih]->Fill( val );
       }
+      std::cout << "fill istogrammi 1D eseguito" << std::endl;
 
       Float_t y_plots[3] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
       for (Int_t ih=0; ih<nplots; ih++) {
+      	std::cout << "Sto per fare fill" << std::endl;
       	plots[ih]->Fill(LHE_mlvlv, y_plots[ih]);
       	std::cout << "Fill 1 eseguito" << std::endl;
       	plots[ih + nvariables]->Fill(LHE_mlvlv, (y_plots[ih] - LHE_mlvlv)/LHE_mlvlv);
