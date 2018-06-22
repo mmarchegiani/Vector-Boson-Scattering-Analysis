@@ -133,6 +133,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    TH2* plots[20];
    Int_t nhists = -1;
    Int_t nplots = 0;
+   TFile *buffer = new TFile( "buffer" + NTrees + ".root","RECREATE" );
    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
       TH1* h = new TH1F( it->first.c_str(), TString(it->first) + " method", 200, 0., 1000.);
       if (it->second) hists[++nhists] = h;
@@ -142,9 +143,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       //Definisco due TH2F per ogni variabile:
       // - variabile vs target
       // - (variabile - target) : target vs target
-
+      if (it->second) {
       for(nplots = 0; nplots < nvariables; nplots++) {
-      	TH2* p1 = new TH2F(variable_name[nplots] + " vs " + target_name,
+      	plots[nplots] = new TH2F("Plot_{1} " + TString(it->first) + " method",
       							   variable_name[nplots] + " vs " + target_name,
       							   mbins,
       							   0.,
@@ -153,7 +154,8 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       							   0.,
       							   1000.
       					);
-      	TH2* p2 = new TH2F("(" + variable_name[nplots] + " - " + target_name + ") : " + target_name + " vs " + target_name,
+      	
+      	plots[nplots + nvariables] = new TH2F("Plot_{2} " + TString(it->first) + " method",
       							   "(" + variable_name[nplots] + " - " + target_name + ") : " + target_name + " vs " + target_name,
       							   mbins,
       							   0.,
@@ -162,18 +164,14 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
       							   0.,
       							   100.
       					);
-      	if (it->second) {
-      		plots[nplots] = p1;
-      		plots[nplots + nvariables] = p2;
-      	}
-      	delete p1;
-      	delete p2;
-      }
-      nplots *= 2;		//Ho 2 plot per ogni variabile, e dato che nplots era l'indice che scorreva sulle variabili lo moltiplico per 2
+   	  }
+   	  nplots *= 2;		//Ho 2 plot per ogni variabile, e dato che nplots era l'indice che scorreva sulle variabili lo moltiplico per 2
 
+      }
    }
    nhists++;
 
+   buffer->Close();
    std::cout << "nvariables = " << nvariables << std::endl;
    std::cout << "nhists = " << nhists << std::endl;
    std::cout << "nplots = " << nplots << std::endl;
@@ -204,28 +202,33 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    //   but of course you can use different ones and copy the values inside the event loop
    //
    TTree* theTree = (TTree*)input->Get("latino_reduced");
+   //input->Close();
+   TFile *target  = new TFile( "TMVARegApp" + NTrees + ".root","RECREATE" );
+   TTree *newtree = theTree->CloneTree();
+   newtree->SetName("latino_reg");
+
    std::cout << "--- Select signal sample" << std::endl;
 
-   theTree->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
-   theTree->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t);
-   theTree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
-   theTree->SetBranchAddress("LHE_mll", &LHE_mll);
-   //theTree->SetBranchAddress("LHE_theta", &LHE_theta);
-   //theTree->SetBranchAddress("LHE_dphill", &LHE_dphill);
-   //theTree->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1);
-   //theTree->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2);
+   newtree->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
+   newtree->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t);
+   newtree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
+   newtree->SetBranchAddress("LHE_mll", &LHE_mll);
+   //newtree->SetBranchAddress("LHE_theta", &LHE_theta);
+   //newtree->SetBranchAddress("LHE_dphill", &LHE_dphill);
+   //newtree->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1);
+   //newtree->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2);
 
    Float_t REG_mlvlv;
-   TBranch *b_REG_mlvlv = theTree->Branch("REG_mlvlv", &REG_mlvlv, "REG_mlvlv/F");
-   theTree->SetBranchAddress("REG_mlvlv", &REG_mlvlv);
-   std::cout << "--- Processing: " << theTree->GetEntries() << " events" << std::endl;
+   TBranch *b_REG_mlvlv = newtree->Branch("REG_mlvlv", &REG_mlvlv, "REG_mlvlv/F");
+   newtree->SetBranchAddress("REG_mlvlv", &REG_mlvlv);
+   std::cout << "--- Processing: " << newtree->GetEntries() << " events" << std::endl;
    TStopwatch sw;
    sw.Start();
-   for (Long64_t ievt=0; ievt<theTree->GetEntries();ievt++) {
+   for (Long64_t ievt=0; ievt<newtree->GetEntries();ievt++) {
       if (ievt%1000 == 0) {
          std::cout << "--- ... Processing event: " << ievt << std::endl;
       }
-      theTree->GetEntry(ievt);
+      newtree->GetEntry(ievt);
       // Retrieve the MVA target values (regression outputs) and fill into histograms
       // NOTE: EvaluateRegression(..) returns a vector for multi-target regression
       for (Int_t ih=0; ih<nhists; ih++) {
@@ -246,15 +249,14 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    sw.Stop();
    std::cout << "--- End of event loop: "; sw.Print();
    // --- Write histograms
-   TFile *target  = new TFile( "TMVARegApp" + NTrees + ".root","RECREATE" );
+   //TFile *target  = new TFile( "TMVARegApp" + NTrees + ".root","RECREATE" );
    for (Int_t ih=0; ih<nhists; ih++) hists[ih]->Write();
    for (Int_t ih=0; ih<nplots; ih++) plots[ih]->Write();
-   TTree *newtree = theTree->CloneTree();
-   newtree->SetName("latino_reg");
+   
    std::cout << "Nuovo TTree salvato." << std::endl;
    newtree->Print();
    target->Write();
-   //theTree->Delete("latino;1");
+   //newtree->Delete("latino;1");
    std::cout << "Lista dei contenuti del file " << target->GetName() << ":" << std::endl;
    target->ls();
 
