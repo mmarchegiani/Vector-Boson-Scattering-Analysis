@@ -1,7 +1,7 @@
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TMVA Regression for Energy scale estimation
 //
-// To launch:  r00t TrainRegression_mlp.cxx
+// To launch:  r00t TrainRegression_mlp.cxx\(\"100\"\,\"TMVAReg100.root\"\)
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #include <cstdlib>
@@ -21,13 +21,19 @@
 
 #include "TMVA/Tools.h"
 #include "TMVA/Factory.h"
+#include "TMVA/DataLoader.h"
 #include "TMVA/Config.h"
 #include "TMVA/TMVAGui.h"
 
 using namespace TMVA;
    
-void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVAReg.root" ) 
+void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg.root" ) 
 {
+   if(TrainName == "") {
+      std::cout << "ERROR: Inserire il nome del Training per salvare le cartelle!" << std::endl;
+      exit(1);
+   }
+
    TMVA::Tools::Instance();   
    
    std::cout << "\n==> Start TMVARegression" << std::endl;
@@ -37,25 +43,25 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    TMVA::Factory *factory = new TMVA::Factory( "TMVARegression", outputFile, 
                                                "!V:!Silent:Color:DrawProgressBar:AnalysisType=Regression" );
 
-   TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset");
+   TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset_" + TrainName);
 
    TMVA::Config::Instance();
-   (TMVA::gConfig().GetIONames()).fWeightFileDir = "weightsMassVariable0Jet";
+   (TMVA::gConfig().GetIONames()).fWeightFileDir = "weightsMassVariable0Jet_" + TrainName;
 
-   dataloader->AddVariable( "metLHEpt" , 'F');
-   dataloader->AddVariable( "std_vector_LHElepton_pt[0]" , 'F');
-   dataloader->AddVariable( "std_vector_LHElepton_pt[1]" , 'F');
+   //ataloader->AddVariable( "metLHEpt" , 'F');
+   //dataloader->AddVariable( "std_vector_LHElepton_pt[0]" , 'F');
+   //dataloader->AddVariable( "std_vector_LHElepton_pt[1]" , 'F');
    dataloader->AddVariable( "LHE_mlvlv_t" , 'F');
    dataloader->AddVariable( "LHE_mllmet" , 'F');
    dataloader->AddVariable( "LHE_mll" , 'F');
-   dataloader->AddVariable( "LHE_theta" , 'F');
-   dataloader->AddVariable( "LHE_dphill" , 'F');
-   dataloader->AddVariable( "LHE_dphill*LHE_mll" , 'F');
+   //dataloader->AddVariable( "LHE_theta" , 'F');
+   //dataloader->AddVariable( "LHE_dphill" , 'F');
+   //dataloader->AddVariable( "LHE_dphill*LHE_mll" , 'F');
    //dataloader->AddVariable( "dphillmet" , 'F');       //Variabile da salvare nel TTree latino_reduced
-   dataloader->AddVariable( "LHE_dphilmet1" , 'F');
-   dataloader->AddVariable( "LHE_dphilmet2" , 'F');
-   dataloader->AddVariable( "LHE_dphilmet1*LHE_mll" , 'F');
-   dataloader->AddVariable( "LHE_dphilmet2*LHE_mll" , 'F');  
+   //dataloader->AddVariable( "LHE_dphilmet1" , 'F');
+   //dataloader->AddVariable( "LHE_dphilmet2" , 'F');
+   //dataloader->AddVariable( "LHE_dphilmet1*LHE_mll" , 'F');
+   //dataloader->AddVariable( "LHE_dphilmet2*LHE_mll" , 'F');  
 
    // Add the variable carrying the regression target
    dataloader->AddTarget( "LHE_mlvlv" ); 
@@ -77,7 +83,6 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    std::cout << "--- TMVARegression           : Using input file: " << input->GetName() << std::endl;
 
    TTree *regTree = (TTree*)input->Get("latino_reduced");
-   std::cout << regTree->GetEntries() << std::endl;
    // global event weights per tree (see below for setting event-wise weights)
    Double_t regWeight  = 1.0;   
 
@@ -125,15 +130,61 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=400:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 
-   factory->BookMethod
+   if(TrainName == "100") {
+      factory->BookMethod
       (
-      dataloader,
-      TMVA::Types::kBDT,
-      "BDT",
-      //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
-      "!H:!V:NTrees=500:MinNodeSize=2.5%:BoostType=AdaBoost:AdaBoostBeta=0.25:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
-        
+   }
+
+   if(TrainName == "200") {
+      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=200:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
+   }
+
+   if(TrainName == "400") {
+      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=400:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
+   }
+   
+   if(TrainName == "800") {
+      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=800:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
+   }
+
+   if(TrainName == "1600") {
+      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=1600:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
+   }
+
 
    // Train MVAs using the set of training events
    factory->TrainAllMethods();
@@ -162,5 +213,5 @@ void TrainRegression_mlp( TString myMethodList = "", TString outfileName = "TMVA
    delete dataloader;
 
    // Launch the GUI for the root macros
-    if (!gROOT->IsBatch()) TMVARegGui( outfileName );
+   //if (!gROOT->IsBatch()) TMVARegGui( outfileName );
 }
