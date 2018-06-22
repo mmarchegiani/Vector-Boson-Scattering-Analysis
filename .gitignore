@@ -3,7 +3,11 @@
 *.save
 *.dat
 dataset/*
-plots/*
+dataset_100/plots/*
+dataset_200/plots/*
+dataset_400/plots/*
+dataset_800/plots/*
+dataset_1600/plots/*
 booleano.C
 stringhe.C
 prova.C
