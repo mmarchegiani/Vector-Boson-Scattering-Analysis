@@ -1,0 +1,10 @@
+Per lavorare con la regressione useremo 3 macro per training, apply e plot.
+
+// Training della regressione con metodo BDT (o BDTG) su 100 NTrees. File output: "TMVAReg100.root".
+r00t TrainRegression_mlp.cxx\(\"100\"\,\"TMVAReg100.root\"\)
+
+// Applicare la regressione usando i pesi generati da TrainRegression_mlp.cxx.
+r00t ApplyRegression.cxx\(\"BDT\"\,\"100\"\)
+
+// Plottare i risultati della regressione, usando i file .root generati da regressione BDT, BDTG o BDTG2 (senza tagli sulla massa).
+r00t PlotRegression.cxx\(\"BDT\"\,\"100\"\)

@@ -117,7 +117,11 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    }
 
    // --- Book the MVA methods
-   TString dir    = "dataset_" + NTrees + "/weightsMassVariable0Jet_" + NTrees + "/";
+   TString dir;
+   if(Use["BDT"])	dir = "BDT_AdaBoost/";
+   //if(Use["BDTG"])	dir = "BDT_Grad/";
+   if(Use["BDTG"])	dir = "BDT_Grad_nocuts/";
+   dir = dir + "dataset_" + NTrees + "/weightsMassVariable0Jet_" + NTrees + "/";
    TString prefix = "TMVARegression";
    // Book method(s)
    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
@@ -133,45 +137,14 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    TH2* plots[20];
    Int_t nhists = -1;
    Int_t nplots = 0;
-   TFile *buffer = new TFile( "buffer" + NTrees + ".root","RECREATE" );
    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
       TH1* h = new TH1F( it->first.c_str(), TString(it->first) + " method", 200, 0., 1000.);
       if (it->second) hists[++nhists] = h;
 
-      //delete h;
-
-      //Definisco due TH2F per ogni variabile:
-      // - variabile vs target
-      // - (variabile - target) : target vs target
-      if (it->second) {
-      for(nplots = 0; nplots < nvariables; nplots++) {
-      	plots[nplots] = new TH2F("Plot_{1} " + variable_name[nplots] + TString(it->first) + " method",
-      							   variable_name[nplots] + " vs " + target_name,
-      							   mbins,
-      							   0.,
-      							   1500.,
-      							   ptbins,
-      							   0.,
-      							   1000.
-      					);
-      	
-      	plots[nplots + nvariables] = new TH2F("Plot_{2} " + variable_name[nplots] + TString(it->first) + " method",
-      							   "(" + variable_name[nplots] + " - " + target_name + ") : " + target_name + " vs " + target_name,
-      							   mbins,
-      							   0.,
-      							   1500.,
-      							   devbins,
-      							   0.,
-      							   100.
-      					);
-   	  }
-   	  nplots *= 2;		//Ho 2 plot per ogni variabile, e dato che nplots era l'indice che scorreva sulle variabili lo moltiplico per 2
-
-      }
+      
    }
    nhists++;
 
-   buffer->Close();
    std::cout << "nvariables = " << nvariables << std::endl;
    std::cout << "nhists = " << nhists << std::endl;
    std::cout << "nplots = " << nplots << std::endl;
@@ -225,9 +198,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    TStopwatch sw;
    sw.Start();
    for (Long64_t ievt=0; ievt<newtree->GetEntries();ievt++) {
-      //if (ievt%1000 == 0) {
+      if (ievt%1000 == 0) {
          std::cout << "--- ... Processing event: " << ievt << std::endl;
-      //}
+      }
       newtree->GetEntry(ievt);
       // Retrieve the MVA target values (regression outputs) and fill into histograms
       // NOTE: EvaluateRegression(..) returns a vector for multi-target regression
@@ -238,17 +211,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
          b_REG_mlvlv->Fill(); 
          hists[ih]->Fill( val );
       }
-      std::cout << "fill istogrammi 1D eseguito" << std::endl;
-
-      Float_t y_plots[3] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
-      for (Int_t ih=0; ih<nplots; ih++) {
-      	std::cout << "Sto per fare fill" << std::endl;
-      	plots[ih]->Fill(LHE_mlvlv, y_plots[ih]);
-      	std::cout << "Fill 1 eseguito" << std::endl;
-      	plots[ih + nvariables]->Fill(LHE_mlvlv, (y_plots[ih] - LHE_mlvlv)/LHE_mlvlv);
-      	std::cout << "Fill 2 eseguito" << std::endl;
-      }
-
+      //std::cout << "fill istogrammi 1D eseguito" << std::endl;
    }
    sw.Stop();
    std::cout << "--- End of event loop: "; sw.Print();

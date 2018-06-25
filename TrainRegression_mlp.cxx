@@ -95,10 +95,10 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
 
    // Apply additional cuts on the signal and background samples (can be different)
    //TCut mycut = "LHE_mlvlv > 160. && LHE_mlvlv < 1000.";
-   TCut mycut = "LHE_mlvlv > 160. && LHE_mlvlv < 1000.";
+   //TCut mycut = "LHE_mlvlv > 160. && LHE_mlvlv < 1000.";
    // If no numbers of events are given, half of the events in the tree are used 
    // for training, and the other half for testing:
-   dataloader->PrepareTrainingAndTestTree( mycut, "SplitMode=random:!V" );
+   //dataloader->PrepareTrainingAndTestTree( mycut, "SplitMode=random:!V" );
    
    // Neural network (MLP)
 
@@ -131,7 +131,7 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
 //         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDT","!H:!V:NTrees=2000:nEventsMin=3:BoostType=AdaBoostR2:SeparationType=RegressionVariance:PruneMethod=CostComplexity:PruneStrength=30" );
 
    if(TrainName == "100") {
-      factory->BookMethod
+/*      factory->BookMethod
       (
          dataloader,
          TMVA::Types::kBDT,
@@ -139,10 +139,19 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
          //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
          "!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
+
+*/      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=100::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
+      //factory->BookMethod( TMVA::Types::kBDT, "BDTG","!H:!V:NTrees=2000::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15" );
    }
 
    if(TrainName == "200") {
-      factory->BookMethod
+/*      factory->BookMethod
       (
          dataloader,
          TMVA::Types::kBDT,
@@ -150,10 +159,17 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
          //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
          "!H:!V:NTrees=200:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
+*/    factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=200::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
    }
 
    if(TrainName == "400") {
-      factory->BookMethod
+/*      factory->BookMethod
       (
          dataloader,
          TMVA::Types::kBDT,
@@ -161,10 +177,17 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
          //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
          "!H:!V:NTrees=400:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
+*/    factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=400::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
    }
    
    if(TrainName == "800") {
-      factory->BookMethod
+/*      factory->BookMethod
       (
          dataloader,
          TMVA::Types::kBDT,
@@ -172,10 +195,17 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
          //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
          "!H:!V:NTrees=800:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
+*/    factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=800::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
    }
 
    if(TrainName == "1600") {
-      factory->BookMethod
+/*      factory->BookMethod
       (
          dataloader,
          TMVA::Types::kBDT,
@@ -183,8 +213,32 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
          //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
          "!H:!V:NTrees=1600:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
       );
+*/    factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=1600::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
    }
 
+   if(TrainName == "2000") {
+/*      factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDT",
+         //"!H:!V:NTrees=100:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+         "!H:!V:NTrees=2000:MinNodeSize=1.0%:BoostType=AdaBoostR2:SeparationType=RegressionVariance:nCuts=20:PruneMethod=CostComplexity:PruneStrength=30"
+      );
+*/    factory->BookMethod
+      (
+         dataloader,
+         TMVA::Types::kBDT,
+         "BDTG",
+         "!H:!V:NTrees=2000::BoostType=Grad:Shrinkage=0.1:UseBaggedGrad:GradBaggingFraction=0.5:MaxDepth=3:NNodesMax=15"
+      );
+   }
 
    // Train MVAs using the set of training events
    factory->TrainAllMethods();
@@ -213,5 +267,5 @@ void TrainRegression_mlp( TString TrainName = "", TString outfileName = "TMVAReg
    delete dataloader;
 
    // Launch the GUI for the root macros
-   //if (!gROOT->IsBatch()) TMVARegGui( outfileName );
+   if (!gROOT->IsBatch()) TMVARegGui( outfileName );
 }
