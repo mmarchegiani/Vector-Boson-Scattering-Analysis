@@ -41,6 +41,7 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    }
 
    TString path, inputfile;
+   if(TrainName == "")  path = "";
    if(TrainName == "BDT")  path = "Test_Methods/BDT_AdaBoost/";
    if(TrainName == "BDTG")  path = "Test_Methods/BDT_Grad/";
    if(TrainName == "BDTG2")  path = "Test_Methods/BDT_Grad_nocuts/";
@@ -72,6 +73,7 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    TH1F* h_target = new TH1F( target_name[1], target_name[1] + " | " + TrainName, mbins, 0., 1500.);
    TH1F* h_regression = new TH1F( target_name[2], target_name[2] + " | " + TrainName, mbins, 0., 1500.);
    TH1F* h_dev = new TH1F( "(" + target_name[2] + "-" + target_name[1] + ") : " + target_name[1], "Deviation from target | " + TrainName, 2*devbins, -2., 2.);
+   TProfile* h_profile = new TProfile("Dev profile", "Profile of " + target_name[2] + " deviation vs " + target_name[1], mbins, 0., 1500., -3., 3.);
 
    //Definisco due TH2F per ogni variabile:
    // - variabile vs target
@@ -123,7 +125,6 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
 
    std::cout << "nvariables = " << nvariables << std::endl;
    std::cout << "nplots = " << nplots << std::endl;
-
 
    std::cout << "Opening " << inputfile << std::endl;
    TFile *input(0);
@@ -186,6 +187,7 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       Float_t dev_mlvlv = (REG_mlvlv - LHE_mlvlv)/LHE_mlvlv;
       plots[nplots-2]->Fill(LHE_mlvlv, REG_mlvlv);
       plots[nplots-1]->Fill(LHE_mlvlv, dev_mlvlv);
+      h_profile->Fill(LHE_mlvlv, dev_mlvlv);
       h_dev->Fill(dev_mlvlv);
 
    }
@@ -217,6 +219,8 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    h_dev->Draw();
    c[1]->Print(path + "dev1d.png");
 
+   if(TrainName == "SK" || TrainName == "F") SubName[1] = '.';
+
    TString results_file = "target_deviation.txt";
    std::ofstream output (results_file.Data(), std::ios::app);
    output << TrainName << "\t" << SubName << "\t" << h_dev->GetMean() << "\t" << h_dev->GetRMS() << endl;
@@ -224,10 +228,14 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
 
    gStyle->SetOptStat(0);     //Elimino lo stat-box dai plot
 
-   for(int i = 0; i < (nplots-2); i++) {
+   int i = 0;
+   for(i = 0; i < (nplots-2); i++) {
       char name[3];
       name[0] = 'c';
-      name[1] = 48+(i+2);
+      if(i + 2 < 10)
+         name[1] = 48+(i+2);  // 0-9 numbers
+      else
+         name[1] = 55+(i+2);  // A-Z letters
       name[2] = '\0';
       c[i+2] = new TCanvas (name, name, 1196, 690);
       plots[i]->Draw("COLZ");
@@ -243,10 +251,13 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       }
    }
 
-   for(int i = nplots-2; i < nplots; i++) {
+   for(i = nplots-2; i < nplots; i++) {
       char name[3];
       name[0] = 'c';
-      name[1] = 48+(i+2);
+      if(i + 2 < 10)
+         name[1] = 48+(i+2);
+      else
+         name[1] = 55+(i+2);
       name[2] = '\0';
       c[i+2] = new TCanvas (name, name, 1196, 690);
       plots[i]->Draw("COLZ");
@@ -261,6 +272,19 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
          c[i+2]->Print(path + "regression_dev.png");
       }
    }
+
+   char name[3];
+   name[0] = 'c';
+   if(i + 2 < 10)
+      name[1] = 48+(i+2);
+   else
+      name[1] = 55+(i+2);
+
+   c[i+2] = new TCanvas (name, name, 1196, 690);
+   h_profile->Draw();
+   h_profile->GetXaxis()->SetTitle(target_name[1] + " [GeV]");
+   h_profile->GetYaxis()->SetTitle(target_name[2] + " mean deviation");
+   c[i+2]->Print(path + "regression_profile.png");
 
 }
 

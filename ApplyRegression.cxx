@@ -122,9 +122,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
 
    // --- Book the MVA methods
    TString path, dir;
-   if(Use["BDT"] && Opt == -1)	path = "Test_Methods/BDT_AdaBoost/";
-   if(Use["BDTG"] && Opt == -1)	path = "Test_Methods/BDT_Grad/";
-   if(Use["BDTG"] && Opt == -1)	path = "Test_Methods/BDT_Grad_nocuts/";
+   //if(Use["BDT"] && Opt == -1)	path = "Test_Methods/BDT_AdaBoost/";
+   //if(Use["BDTG"] && Opt == -1)	path = "Test_Methods/BDT_Grad/";
+   if(Use["BDTG"] && Opt < 0)	path = "";
    if(Use["BDTG"] && Opt == 0)	path = "NTrees/";
    if(Use["BDTG"] && Opt == 1)	path = "Shrinkage/";
    if(Use["BDTG"] && Opt == 2)	path = "Fraction/";
