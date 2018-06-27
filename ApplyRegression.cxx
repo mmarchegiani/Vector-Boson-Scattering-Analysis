@@ -18,6 +18,7 @@
 #include "TStopwatch.h"
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
+#include "substr.C"
 using namespace TMVA;
 
 #define ptbins 200
@@ -26,7 +27,7 @@ using namespace TMVA;
 #define mbins 200
 #define devbins 50
 
-void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" ) 
+void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Opt = -1) 
 {
    // This loads the library
    TMVA::Tools::Instance();
@@ -55,6 +56,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    // --- Boosted Decision Trees
    Use["BDT"]             = 0;
    Use["BDTG"]            = 1;
+   //
+   // --- Configuration of parameters
+
    // ---------------------------------------------------------------
    std::cout << std::endl;
    std::cout << "==> Start TMVARegressionApplication" << std::endl;
@@ -117,11 +121,15 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    }
 
    // --- Book the MVA methods
-   TString dir;
-   if(Use["BDT"])	dir = "BDT_AdaBoost/";
-   //if(Use["BDTG"])	dir = "BDT_Grad/";
-   if(Use["BDTG"])	dir = "BDT_Grad_nocuts/";
-   dir = dir + "dataset_" + NTrees + "/weightsMassVariable0Jet_" + NTrees + "/";
+   TString path, dir;
+   if(Use["BDT"] && Opt == -1)	path = "Test_Methods/BDT_AdaBoost/";
+   if(Use["BDTG"] && Opt == -1)	path = "Test_Methods/BDT_Grad/";
+   if(Use["BDTG"] && Opt == -1)	path = "Test_Methods/BDT_Grad_nocuts/";
+   if(Use["BDTG"] && Opt == 0)	path = "NTrees/";
+   if(Use["BDTG"] && Opt == 1)	path = "Shrinkage/";
+   if(Use["BDTG"] && Opt == 2)	path = "Fraction/";
+   if(Use["BDTG"] && Opt == 3)	path = "MaxDepth/";
+   dir = path + "dataset_" + SubName + "/weightsMassVariable0Jet_" + SubName + "/";
    TString prefix = "TMVARegression";
    // Book method(s)
    for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) {
@@ -154,8 +162,9 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    // we'll later on use only the "signal" events for the test in this example.
    //   
    TFile *input(0);
-   //TString fname = "./WpWmJJ/WpWmJJ_reduced.root";
-   TString fname = "./WpWpJJ/WpWpJJ_reduced.root";
+   TString fname = "./WpWmJJ/WpWmJJ_reduced.root";
+   //TString fname = "./WpWpJJ/WpWpJJ_reduced.root";
+
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    } 
@@ -176,7 +185,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    //
    TTree* theTree = (TTree*)input->Get("latino_reduced");
    //input->Close();
-   TFile *target  = new TFile( "TMVARegApp" + NTrees + ".root","RECREATE" );
+   TFile *target  = new TFile( path + "TMVARegApp" + SubName + ".root","RECREATE" );
    TTree *newtree = theTree->CloneTree();
    newtree->SetName("latino_reg");
 
@@ -216,7 +225,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString NTrees = "" )
    sw.Stop();
    std::cout << "--- End of event loop: "; sw.Print();
    // --- Write histograms
-   //TFile *target  = new TFile( "TMVARegApp" + NTrees + ".root","RECREATE" );
+   //TFile *target  = new TFile( "TMVARegApp" + SubName + ".root","RECREATE" );
    for (Int_t ih=0; ih<nhists; ih++) hists[ih]->Write();
    for (Int_t ih=0; ih<nplots; ih++) plots[ih]->Write();
    

@@ -33,7 +33,7 @@ using namespace TMVA;
 #define mbins 200
 #define devbins 50
    
-void PlotRegression( TString TrainName = "", TString NTrees = "" ) 
+void PlotRegression( TString TrainName = "", TString SubName = "" ) 
 {
    if(TrainName == "") {
       std::cout << "ERROR: Inserire il nome del Training per selezionare la cartella!" << std::endl;
@@ -41,11 +41,16 @@ void PlotRegression( TString TrainName = "", TString NTrees = "" )
    }
 
    TString path, inputfile;
-   if(TrainName == "BDT")  path = "BDT_AdaBoost/";
-   if(TrainName == "BDTG")  path = "BDT_Grad/";
-   if(TrainName == "BDTG2")  path = "BDT_Grad_nocuts/";
+   if(TrainName == "BDT")  path = "Test_Methods/BDT_AdaBoost/";
+   if(TrainName == "BDTG")  path = "Test_Methods/BDT_Grad/";
+   if(TrainName == "BDTG2")  path = "Test_Methods/BDT_Grad_nocuts/";
+   if(TrainName == "BDTG3")  path = "Test_Methods/BDT_Grad_MaxDepth10/";
+   if(TrainName == "NT")   path = "NTrees/";
+   if(TrainName == "SK")   path = "Shrinkage/";
+   if(TrainName == "F")   path = "Fraction/";
+   if(TrainName == "MD")   path = "MaxDepth/";
 
-   inputfile = path + "TMVARegApp" + NTrees + ".root";
+   inputfile = path + "TMVARegApp" + SubName + ".root";
 
    TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}"};
    TString target_name[3] = {"M_{l#nul#nu}","M_{l#nul#nu, true}","M_{l#nul#nu, regression}"};
@@ -66,6 +71,7 @@ void PlotRegression( TString TrainName = "", TString NTrees = "" )
 
    TH1F* h_target = new TH1F( target_name[1], target_name[1] + " | " + TrainName, mbins, 0., 1500.);
    TH1F* h_regression = new TH1F( target_name[2], target_name[2] + " | " + TrainName, mbins, 0., 1500.);
+   TH1F* h_dev = new TH1F( "(" + target_name[2] + "-" + target_name[1] + ") : " + target_name[1], "Deviation from target | " + TrainName, 2*devbins, -2., 2.);
 
    //Definisco due TH2F per ogni variabile:
    // - variabile vs target
@@ -119,9 +125,8 @@ void PlotRegression( TString TrainName = "", TString NTrees = "" )
    std::cout << "nplots = " << nplots << std::endl;
 
 
-
+   std::cout << "Opening " << inputfile << std::endl;
    TFile *input(0);
-   //TString fname = "./WpWmJJ/WpWmJJ_reduced.root";
    if (!gSystem->AccessPathName( inputfile )) {
       input = TFile::Open( inputfile ); // check if file in local directory exists
    } 
@@ -180,29 +185,42 @@ void PlotRegression( TString TrainName = "", TString NTrees = "" )
 
       Float_t dev_mlvlv = (REG_mlvlv - LHE_mlvlv)/LHE_mlvlv;
       plots[nplots-2]->Fill(LHE_mlvlv, REG_mlvlv);
-      plots[nplots-1]->Fill(LHE_mlvlv, dev_mlvlv);      
+      plots[nplots-1]->Fill(LHE_mlvlv, dev_mlvlv);
+      h_dev->Fill(dev_mlvlv);
 
    }
 
    TCanvas* c[20];
-   path = path + "dataset_" + NTrees + "/plots/";     //Mi sposto nella cartella plots/ per salvare i plot
+   path = path + "dataset_" + SubName + "/plots/";     // Mi sposto nella cartella plots/ per salvare i plot
+   gSystem->Exec("mkdir " + path);                     // Creo la cartella plots/
+   std::cout << "Saving plots in " << path << std::endl;
 
    c[0] = new TCanvas ("c0", "c0", 1196, 690);
-   h_target->GetXaxis()->SetTitle(target_name[1] + " [GeV]");
-   h_target->GetYaxis()->SetTitle("N");
-   h_target->Draw();
-   //c[1] = new TCanvas ("c1", "c1", 1196, 690);
-   h_regression->GetXaxis()->SetTitle(target_name[2] + " [GeV]");
+   h_regression->GetXaxis()->SetTitle(target_name[0] + " [GeV]");
    h_regression->GetYaxis()->SetTitle("N");
    h_regression->SetLineColor(kRed);
-   h_regression->Draw("same");
-
+   h_regression->Draw();
+   //c[1] = new TCanvas ("c1", "c1", 1196, 690);
+   h_target->GetXaxis()->SetTitle(target_name[0] + " [GeV]");
+   h_target->GetYaxis()->SetTitle("N");
+   h_target->Draw("same");
    TLegend *legend = new TLegend(0.78, 0.60, 0.98, 0.75);
    legend->AddEntry(h_target, "Target", "l");
    legend->AddEntry(h_regression, "Regression", "l");
    legend->Draw();
-
    c[0]->Print(path + "target1d.png");
+
+
+   c[1] = new TCanvas ("c1", "c1", 1196, 690);
+   h_dev->GetXaxis()->SetTitle("Relative deviation");
+   h_dev->GetYaxis()->SetTitle("N");
+   h_dev->Draw();
+   c[1]->Print(path + "dev1d.png");
+
+   TString results_file = "target_deviation.txt";
+   std::ofstream output (results_file.Data(), std::ios::app);
+   output << TrainName << "\t" << SubName << "\t" << h_dev->GetMean() << "\t" << h_dev->GetRMS() << endl;
+   output.close();
 
    gStyle->SetOptStat(0);     //Elimino lo stat-box dai plot
 
