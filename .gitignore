@@ -2,6 +2,7 @@
 *.pdf
 *.save
 *.dat
+*.o
 dataset/*
 dataset_100/plots/*
 dataset_200/plots/*
