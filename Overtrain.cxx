@@ -55,14 +55,14 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
    TH2* plots[4];
    Int_t nplots = 4;
 
-   TH1F* train_dev = new TH1F( "(" + target_name[2] + "-" + target_name[1] + ") : " + target_name[1] + " | Train", "Training sample deviation", 2*devbins, -2., 2.);
-   TH1F* test_dev = new TH1F( "(" + target_name[2] + "-" + target_name[1] + ") : " + target_name[1] + " | Test", "Test sample deviation", 2*devbins, -2., 2.);
-   TProfile* train_profile = new TProfile("Train profile", "Training sample profile of deviation", mbins, 0., 1500., -3., 3.);
-   TProfile* test_profile = new TProfile("Test profile", "Test sample profile of deviation", mbins, 0., 1500., -3., 3.);
+   TH1F* train_dev = new TH1F( target_name[2] + " dev Train", "Training/test sample deviation", 2*devbins, -2., 2.);
+   TH1F* test_dev = new TH1F( target_name[2] + " dev Test", "Training/test sample deviation", 2*devbins, -2., 2.);
+   TProfile* train_profile = new TProfile("Train profile", "Training/test sample profile of deviation", mbins, 0., 1500., -3., 3.);
+   TProfile* test_profile = new TProfile("Test profile", "Training/test sample profile of deviation", mbins, 0., 1500., -3., 3.);
    
 
    plots[0] = new TH2F("Dev " + target_name[2] + " | Training sample",
-                           "(" + target_name[2] + " - " + target_name[1] + ") : " + target_name[1] + " vs " + target_name[1],
+                           "(" + target_name[2] + " - " + target_name[1] + ") : " + target_name[1] + " vs " + target_name[1] + " | Training sample",
                            mbins,
                            0.,
                            1500.,
@@ -72,7 +72,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
                   );
 
    plots[1] = new TH2F("Dev " + target_name[2] + " | Test sample",
-                           "(" + target_name[2] + " - " + target_name[1] + ") : " + target_name[1] + " vs " + target_name[1],
+                           "(" + target_name[2] + " - " + target_name[1] + ") : " + target_name[1] + " vs " + target_name[1] + " | Test sample",
                            mbins,
                            0.,
                            1500.,
@@ -82,7 +82,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
                   );
 
    plots[2] = new TH2F("Corr " + target_name[2] + " | Training sample",
-                           target_name[2] + " vs " + target_name[1],
+                           target_name[2] + " vs " + target_name[1] + " | Training sample",
                            mbins,
                            0.,
                            1500.,
@@ -92,7 +92,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
                   );
 
    plots[3] = new TH2F("Corr " + target_name[2] + " | Test sample",
-                           target_name[2] + " vs " + target_name[1],
+                           target_name[2] + " vs " + target_name[1] + " | Test sample",
                            mbins,
                            0.,
                            1500.,
@@ -114,14 +114,13 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
       }   
    }
 
-   path = path + "dataset_" + SubName;
+   path = path + "dataset_" + SubName + "/";
    std::cout << path << std::endl;
-   std::cout << input->cd("./" + path) << std::endl;
 
    // --- Event loop
 
-   TTree* trainTree = (TTree*)input->Get("TrainTree");
-   TTree* testTree = (TTree*)input->Get("TestTree");
+   TTree* trainTree = (TTree*)input->Get(path + "TrainTree");
+   TTree* testTree = (TTree*)input->Get(path + "TestTree");
    //input->Close();
 
    // Target
@@ -179,11 +178,12 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
    test_dev->Draw("same");
 
    TLegend *legend = new TLegend(0.78, 0.60, 0.98, 0.75);
-   legend->AddEntry(train_dev, "Training", "p");
-   legend->AddEntry(test_dev, "Test", "p");
+   legend->AddEntry(train_dev, "Training", "l");
+   legend->AddEntry(test_dev, "Test", "l");
    legend->Draw();
    c[0]->Print(path + "overtrain1d.png");
 
+   gStyle->SetOptStat(0);     //Elimino lo stat-box dai plot
 
    c[1] = new TCanvas ("c1", "c1", 1196, 690);
    train_profile->GetXaxis()->SetTitle(target_name[1] + " [GeV]");
@@ -205,11 +205,9 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
    TString results_file = "overtrain_deviation.txt";
    std::ofstream output (results_file.Data(), std::ios::app);
    output << TrainName << "\t" << SubName << "\t" <<
-             train_dev->GetMean() << "\t" << train_dev->GetRMS() <<
+             train_dev->GetMean() << "\t" << train_dev->GetRMS() << "\t" <<
              test_dev->GetMean() << "\t" << test_dev->GetRMS() << endl;
    output.close();
-
-   gStyle->SetOptStat(0);     //Elimino lo stat-box dai plot
 
    for(int i = 0; i < 4; i++) {
       char name[3];
