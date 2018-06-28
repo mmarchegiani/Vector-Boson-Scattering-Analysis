@@ -36,6 +36,16 @@ using namespace TMVA;
 #define mbins 200
 #define devbins 50
 
+// Shrinkage = 0.13
+// Fraction = 0.85
+
+void regression(TString NTrees) {
+	TString subname;
+	subname = TrainRegression_bdtg(NTrees, "0.13", "0.85", "3", 0);
+	ApplyRegression("BDTG", subname, 0);
+	PlotRegression("NT", subname);
+}
+
 /*
 void regression(TString Shrinkage) {
 	TString subname;
@@ -45,9 +55,11 @@ void regression(TString Shrinkage) {
 }
 */
 
+/*
 void regression(TString Fraction) {
 	TString subname;
 	subname = TrainRegression_bdtg("800", "0.13", Fraction, "3", 2);
 	ApplyRegression("BDTG", subname, 2);
 	PlotRegression("F", subname);
 }
+*/
