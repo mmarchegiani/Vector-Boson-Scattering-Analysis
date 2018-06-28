@@ -35,10 +35,7 @@ using namespace TMVA;
    
 void PlotRegression( TString TrainName = "", TString SubName = "" ) 
 {
-   if(TrainName == "") {
-      std::cout << "ERROR: Inserire il nome del Training per selezionare la cartella!" << std::endl;
-      exit(1);
-   }
+   std::cout << "==> Start TMVAPlotRegression" << std::endl;
 
    TString path, inputfile;
    if(TrainName == "")  path = "";
@@ -53,7 +50,12 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
 
    inputfile = path + "TMVARegApp" + SubName + ".root";
 
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}"};
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "#Delta#phi_{ll}M_{ll}"};
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p^{T}_{l1}"};
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
    TString target_name[3] = {"M_{l#nul#nu}","M_{l#nul#nu, true}","M_{l#nul#nu, regression}"};
 
    Int_t nvariables = 0;
@@ -153,14 +155,17 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    // Regression target
    Float_t REG_mlvlv;
 
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    theTree->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
    theTree->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t);
    theTree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
    theTree->SetBranchAddress("LHE_mll", &LHE_mll);
    //theTree->SetBranchAddress("LHE_theta", &LHE_theta);
    //theTree->SetBranchAddress("LHE_dphill", &LHE_dphill);
+   //theTree->SetBranchAddress("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll);
    //theTree->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1);
    //theTree->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2);
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    theTree->SetBranchAddress("REG_mlvlv", &REG_mlvlv);
 
@@ -175,7 +180,11 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       h_target->Fill(LHE_mlvlv);
       h_regression->Fill(REG_mlvlv);
 
-      Float_t y_plots[3] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
+      //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll, LHE_dphillxLHE_mll};
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
       for (Int_t ih=0; ih<nvariables; ih++) {
          //std::cout << "Sto per fare fill" << std::endl;
          plots[ih]->Fill(LHE_mlvlv, y_plots[ih]);

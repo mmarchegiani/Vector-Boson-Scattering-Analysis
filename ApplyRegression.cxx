@@ -88,7 +88,7 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    // Target
    Float_t LHE_mlvlv;
 
-   
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
    reader->AddVariable( "LHE_mlvlv_t" , &LHE_mlvlv_t);
    reader->AddVariable( "LHE_mllmet" , &LHE_mllmet);
    reader->AddVariable( "LHE_mll" , &LHE_mll);
@@ -98,16 +98,21 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    //reader->AddVariable( "LHE_theta" , &LHE_theta);
    //reader->AddVariable( "LHE_dphill" , &LHE_dphill);
    //reader->AddVariable( "LHE_dphill*LHE_mll" , &LHE_dphillxLHE_mll);
-	//reader->AddVariable( "dphillmet" , 'F'); 
+   //reader->AddVariable( "dphillmet" , 'F'); 
    //reader->AddVariable( "LHE_dphilmet1" , &LHE_dphilmet1);
    //reader->AddVariable( "LHE_dphilmet2" , &LHE_dphilmet2);
    //reader->AddVariable( "LHE_dphilmet1*LHE_mll" , &LHE_dphilmet1xLHE_mll);
    //reader->AddVariable( "LHE_dphilmet2*LHE_mll" , &LHE_dphilmet2xLHE_mll);
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   //Dichiaro i nomi delle variabili così come verranno passati nei plot
-   //La seguente riga è HARDCODED!
+   // Dichiaro i nomi delle variabili così come verranno passati nei plot
+   // La seguente riga è HARDCODED!
 
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}"};
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "#Delta#phi_{ll}M_{ll}"};
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p^{T}_{l1}"};
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    TString target_name = "M_{l#nul#nu}";
    Int_t nvariables = 0;
    for(int i = 0; i < 14; i++) {
@@ -191,18 +196,29 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
 
    std::cout << "--- Select signal sample" << std::endl;
 
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    newtree->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
    newtree->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t);
    newtree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
    newtree->SetBranchAddress("LHE_mll", &LHE_mll);
+
+   //newtree->SetBranchAddress("std_vector_LHElepton_pt[0]", &std_vector_LHElepton_pt[0]);
+   //newtree->SetBranchAddress("std_vector_LHElepton_pt[1]", &std_vector_LHElepton_pt[1]);
    //newtree->SetBranchAddress("LHE_theta", &LHE_theta);
    //newtree->SetBranchAddress("LHE_dphill", &LHE_dphill);
    //newtree->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1);
    //newtree->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2);
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    Float_t REG_mlvlv;
    TBranch *b_REG_mlvlv = newtree->Branch("REG_mlvlv", &REG_mlvlv, "REG_mlvlv/F");
    newtree->SetBranchAddress("REG_mlvlv", &REG_mlvlv);
+
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//   TBranch *b_LHE_dphillxLHE_mll = newtree->Branch("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll, "LHE_dphillxLHE_mll/F");
+//   newtree->SetBranchAddress("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll);
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
    std::cout << "--- Processing: " << newtree->GetEntries() << " events" << std::endl;
    TStopwatch sw;
    sw.Start();
@@ -219,6 +235,10 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
          REG_mlvlv = val;
          b_REG_mlvlv->Fill(); 
          hists[ih]->Fill( val );
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//         LHE_dphillxLHE_mll = LHE_dphill*LHE_mll;
+//         b_LHE_dphillxLHE_mll->Fill();
+   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       }
       //std::cout << "fill istogrammi 1D eseguito" << std::endl;
    }
