@@ -1,0 +1,2 @@
+Sample:	W+W-
+Run:	subname = TrainRegression_bdtg("800", Shrinkage, "0.6", "3", 1);

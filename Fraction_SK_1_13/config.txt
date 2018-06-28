@@ -1,0 +1,3 @@
+Sample: W+W-
+Run:	TrainRegression_bdtg("800", "1.13", Fraction, "3", 2);
+Note:	Lo Shrinkage è stato erroneamente settato a 1.13 anziché 0.13, il valore ottimale.
