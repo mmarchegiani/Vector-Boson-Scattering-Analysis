@@ -38,7 +38,7 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    std::cout << "==> Start TMVAPlotRegression" << std::endl;
 
    TString path, inputfile;
-   if(TrainName == "")  path = "";
+   if(TrainName == "")  path = "Regression/";
    if(TrainName == "BDT")  path = "Test_Methods/BDT_AdaBoost/";
    if(TrainName == "BDTG")  path = "Test_Methods/BDT_Grad/";
    if(TrainName == "BDTG2")  path = "Test_Methods/BDT_Grad_nocuts/";
@@ -51,7 +51,13 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    inputfile = path + "TMVARegApp" + SubName + ".root";
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}"};
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}"};                            // #1
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}"};              // #2
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}"};            // #3
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*M_{ll}", "p_{T, MET}"};          // #4
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "4*M_{ll}", "p_{T, MET}"};          // #5
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "2*p_{T, MET}"};          // #6
+   TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "p_{T, lepton1}"};         // #7
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "#Delta#phi_{ll}M_{ll}"};
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p^{T}_{l1}"};
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,8 +152,12 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    //input->Close();
 
    // Variables
-   Float_t  metLHEpt, std_vector_LHElepton_pt[2], LHE_mlvlv_t, LHE_mllmet, LHE_mll,
-            LHE_theta, LHE_dphill, LHE_dphilmet1, LHE_dphilmet2, LHE_dphillxLHE_mll, LHE_dphilmet1xLHE_mll, LHE_dphilmet2xLHE_mll;
+   Float_t  metLHEpt, LHE_mlvlv_t, LHE_mllmet, LHE_mll,
+            LHE_theta, LHE_dphill, LHE_dphilmet1, LHE_dphilmet2, LHE_dphillxLHE_mll, LHE_dphilmet1xLHE_mll, LHE_dphilmet2xLHE_mll,
+            LHE_mlvlv_tx2, LHE_mllx2, LHE_mllx4, metLHEptx2;
+
+   Float_t std_vector_LHElepton_pt1;
+   vector<float> *std_vector_LHElepton_pt;
 
    // Target
    Float_t LHE_mlvlv;
@@ -158,8 +168,15 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    theTree->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv);
    theTree->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t);
+   theTree->SetBranchAddress("LHE_mlvlv_tx2", &LHE_mlvlv_tx2);
    theTree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
    theTree->SetBranchAddress("LHE_mll", &LHE_mll);
+   theTree->SetBranchAddress("LHE_mllx2", &LHE_mllx2);
+   theTree->SetBranchAddress("LHE_mllx4", &LHE_mllx4);
+   theTree->SetBranchAddress("metLHEpt", &metLHEpt);
+   theTree->SetBranchAddress("metLHEptx2", &metLHEptx2);
+   theTree->SetBranchAddress("std_vector_LHElepton_pt", &std_vector_LHElepton_pt);
+   //thetree->SetBranchAddress("std_vector_LHElepton_pt[1]", &std_vector_LHElepton_pt[1]);
    //theTree->SetBranchAddress("LHE_theta", &LHE_theta);
    //theTree->SetBranchAddress("LHE_dphill", &LHE_dphill);
    //theTree->SetBranchAddress("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll);
@@ -181,7 +198,15 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       h_regression->Fill(REG_mlvlv);
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};
+      //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};                                     // #1
+      //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt};                           // #2
+      //Float_t y_plots[20] = {LHE_mlvlv_tx2, LHE_mllmet, LHE_mll, metLHEpt};                         // #3
+      //Float_t y_plots[20] = {LHE_mlvlv_tx2, LHE_mllmet, LHE_mllx2, metLHEpt};                       // #4
+      //Float_t y_plots[20] = {LHE_mlvlv_tx2, LHE_mllmet, LHE_mllx4, metLHEpt};                       // #5
+      //Float_t y_plots[20] = {LHE_mlvlv_tx2, LHE_mllmet, LHE_mll, metLHEptx2};                       // #6
+      Float_t y_plots[20] = {LHE_mlvlv_tx2, LHE_mllmet, LHE_mll, metLHEpt, std_vector_LHElepton_pt->at(0)};        // #7
+
+
       //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll, LHE_dphillxLHE_mll};
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
