@@ -38,7 +38,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
    std::cout << "==> Start TMVAOvertrain" << std::endl;
 
    TString path, inputfile;
-   if(TrainName == "")  path = "";
+   if(TrainName == "")  path = "Regression/";
    if(TrainName == "BDT")  path = "Test_Methods/BDT_AdaBoost/";
    if(TrainName == "BDTG")  path = "Test_Methods/BDT_Grad/";
    if(TrainName == "BDTG2")  path = "Test_Methods/BDT_Grad_nocuts/";
@@ -164,11 +164,11 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
    }
 
    TCanvas* c[6];
-   path = path + "dataset_" + SubName + "/plots/";     // Mi sposto nella cartella plots/ per salvare i plot
-   gSystem->Exec("mkdir " + path);                     // Creo la cartella plots/
+   path = path + "plots/";            // Mi sposto nella cartella plots/ per salvare i plot
+   gSystem->Exec("mkdir " + path);     // Creo la cartella plots/
    std::cout << "Saving plots in " << path << std::endl;
 
-   c[0] = new TCanvas ("c0", "c0", 1196, 690);
+   c[0] = new TCanvas ("b0", "b0", 1196, 690);
    train_dev->GetXaxis()->SetTitle("Deviation");
    train_dev->GetYaxis()->SetTitle("N");
    train_dev->SetLineColor(kRed);
@@ -185,7 +185,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
 
    gStyle->SetOptStat(0);     //Elimino lo stat-box dai plot
 
-   c[1] = new TCanvas ("c1", "c1", 1196, 690);
+   c[1] = new TCanvas ("b1", "b1", 1196, 690);
    train_profile->GetXaxis()->SetTitle(target_name[1] + " [GeV]");
    train_profile->GetYaxis()->SetTitle(target_name[2] + " mean deviation");
    train_profile->SetLineColor(kRed);
@@ -211,7 +211,7 @@ void Overtrain( TString TrainName = "", TString SubName = "" )
 
    for(int i = 0; i < 4; i++) {
       char name[3];
-      name[0] = 'c';
+      name[0] = 'b';
       if(i + 2 < 10)
          name[1] = 48+(i+2);
       else

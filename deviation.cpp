@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
 	const int n = 50;
 	double par[n], mean[n], rms[n];
 	double mean1[n], rms1[n];
-	double devmax = 0., rmsmax = 0.;
 
 	std::ifstream infile(argv[1]);
 	int j = 0;
@@ -54,15 +53,6 @@ int main(int argc, char **argv) {
 		}
 		if(nColoumns == 6)
 			infile >> buffer >> par[j] >> mean[j] >> rms[j] >> mean1[j] >> rms1[j];
-
-		if(fabs(mean[j]) > devmax)
-			devmax = fabs(mean[j]);
-		if(fabs(mean1[j]) > devmax)
-			devmax = fabs(mean1[j]);
-		if(rms[j] > rmsmax)
-			rmsmax = rms[j];
-		if(rms1[j] > rmsmax)
-			rmsmax = rms1[j];
 		j++;
 	}
 	infile.close();
