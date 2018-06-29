@@ -1,6 +1,7 @@
 #include "TrainRegression_bdtg.cxx"
 #include "ApplyRegression.cxx"
 #include "PlotRegression.cxx"
+#include "Overtrain.cxx"
 //#include "substr.C"
 
 #include <cstdlib>
@@ -36,15 +37,27 @@ using namespace TMVA;
 #define mbins 200
 #define devbins 50
 
+// NTrees = 800
 // Shrinkage = 0.13
 // Fraction = 0.85
+// MaxDepth = 3
 
+void regression(int Opt) {
+	//TString subname = TrainRegression_bdtg("800", "0.13", "0.85", "3", Opt);
+	TString subname = "7";
+	ApplyRegression("BDTG", subname, Opt);
+	PlotRegression("", subname);
+	Overtrain("", subname);
+}
+
+/*
 void regression(TString NTrees) {
 	TString subname;
 	subname = TrainRegression_bdtg(NTrees, "0.13", "0.85", "3", 0);
 	ApplyRegression("BDTG", subname, 0);
 	PlotRegression("NT", subname);
 }
+*/
 
 /*
 void regression(TString Shrinkage) {
@@ -61,5 +74,14 @@ void regression(TString Fraction) {
 	subname = TrainRegression_bdtg("800", "0.13", Fraction, "3", 2);
 	ApplyRegression("BDTG", subname, 2);
 	PlotRegression("F", subname);
+}
+*/
+
+/*
+void regression(TString MaxDepth) {
+	TString subname;
+	subname = TrainRegression_bdtg("1700", "0.13", "0.85", MaxDepth, 3);
+	ApplyRegression("BDTG", subname, 3);
+	PlotRegression("MD", subname);
 }
 */

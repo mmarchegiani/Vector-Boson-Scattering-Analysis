@@ -1,28 +1,5 @@
 # !/bin/sh
-# Script per lanciare più volte la regression, applicarla e plottare i risultati.
+# Script per lanciare più volte la Overtrain, applicarla e plottare i risultati.
 
-root -l -q regression.cxx\(\"50\"\)
-root -l -q regression.cxx\(\"100\"\)
-root -l -q regression.cxx\(\"200\"\)
-root -l -q regression.cxx\(\"300\"\)
-root -l -q regression.cxx\(\"400\"\)
-root -l -q regression.cxx\(\"500\"\)
-root -l -q regression.cxx\(\"600\"\)
-root -l -q regression.cxx\(\"700\"\)
-root -l -q regression.cxx\(\"800\"\)
-root -l -q regression.cxx\(\"900\"\)
-root -l -q regression.cxx\(\"1000\"\)
-root -l -q regression.cxx\(\"1100\"\)
-root -l -q regression.cxx\(\"1200\"\)
-root -l -q regression.cxx\(\"1300\"\)
-root -l -q regression.cxx\(\"1400\"\)
-root -l -q regression.cxx\(\"1500\"\)
-root -l -q regression.cxx\(\"1600\"\)
-root -l -q regression.cxx\(\"1700\"\)
-root -l -q regression.cxx\(\"1800\"\)
-root -l -q regression.cxx\(\"1900\"\)
-root -l -q regression.cxx\(\"2000\"\)
-root -l -q regression.cxx\(\"2100\"\)
-root -l -q regression.cxx\(\"2200\"\)
-root -l -q regression.cxx\(\"2300\"\)
-root -l -q regression.cxx\(\"2400\"\)
+cp -r Regression/* Regression_backup/
+root -l -q regression.cxx\(-7\)
