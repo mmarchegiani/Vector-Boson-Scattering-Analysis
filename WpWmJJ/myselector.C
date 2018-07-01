@@ -45,9 +45,11 @@ void myselector::Begin(TTree * /*tree*/)
 
    if(opzioni[2] = "tree") {
       fChain = latino;
-      treefile = new TFile("WpWmJJ_reduced.root", "update");
+      //treefile = new TFile("WpWmJJ_reduced.root", "update");
+      treefile = new TFile("WpWmJJ_reduced2.root", "update");
       if(treefile->GetSize() > 2000000) {
-        	std::cout << "File WpWmJJ_reduced.root già esistente. Sovrascrivere? (S/N) ";
+         //std::cout << "File WpWmJJ_reduced.root già esistente. Sovrascrivere? (S/N) ";
+        	std::cout << "File WpWmJJ_reduced2.root già esistente. Sovrascrivere? (S/N) ";
         	TString answer;
         	std::cin >> answer;
         	delete treefile;
@@ -57,7 +59,8 @@ void myselector::Begin(TTree * /*tree*/)
         		return;
         }
       }
-      treefile = new TFile("WpWmJJ_reduced.root", "recreate");
+      //treefile = new TFile("WpWmJJ_reduced.root", "recreate");
+      treefile = new TFile("WpWmJJ_reduced2.root", "recreate");
 
    		b_LHE_mlvlv = fChain->Branch("LHE_mlvlv", &LHE_mlvlv, "LHE_mlvlv/F");           //Definisco i nuovi Branches
    		b_LHE_mlvlv_t = fChain->Branch("LHE_mlvlv_t", &LHE_mlvlv_t, "LHE_mlvlv_t/F");
@@ -67,6 +70,7 @@ void myselector::Begin(TTree * /*tree*/)
    		b_LHE_dphill = fChain->Branch("LHE_dphill", &LHE_dphill, "LHE_dphill/F");
    		b_LHE_dphilmet1 = fChain->Branch("LHE_dphilmet1", &LHE_dphilmet1, "LHE_dphilmet1/F");
    		b_LHE_dphilmet2 = fChain->Branch("LHE_dphilmet2", &LHE_dphilmet2, "LHE_dphilmet2/F");
+         b_LHE_mjj = fChain->Branch("LHE_mjj", &LHE_mjj, "LHE_mjj/F");
 
 		  fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv, &b_LHE_mlvlv);           //Branches aggiunti da me
    		fChain->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t, &b_LHE_mlvlv_t);
@@ -75,11 +79,14 @@ void myselector::Begin(TTree * /*tree*/)
    		fChain->SetBranchAddress("LHE_theta", &LHE_theta, &b_LHE_theta);
    		fChain->SetBranchAddress("LHE_dphill", &LHE_dphill, &b_LHE_dphill);
    		fChain->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1, &b_LHE_dphilmet1);
-   		fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
+         fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
+   		fChain->SetBranchAddress("LHE_mjj", &LHE_mjj, &LHE_mjj);
+         fChain->SetBranchAddress("LHE_theta_jj", &LHE_theta_jj, &b_LHE_theta_jj);
 
    		fChain_selected = fChain->CloneTree(0);
 
-   		fChain_selected->SetBranchAddress("std_vector_LHElepton_pt", &s_std_vector_LHElepton_pt);            //Definisco indirizzo delle variabili dei nuovi Branches
+         fChain_selected->SetBranchAddress("std_vector_LHElepton_pt", &s_std_vector_LHElepton_pt);
+   		fChain_selected->SetBranchAddress("std_vector_LHEparton_pt", &s_std_vector_LHEparton_pt);
    		fChain_selected->SetBranchAddress("metLHEpt", &s_metLHEpt);            //Definisco indirizzo delle variabili dei nuovi Branches
    		fChain_selected->SetBranchAddress("LHE_mlvlv", &s_LHE_mlvlv);            //Definisco indirizzo delle variabili dei nuovi Branches
    		fChain_selected->SetBranchAddress("LHE_mlvlv_t", &s_LHE_mlvlv_t);
@@ -89,9 +96,13 @@ void myselector::Begin(TTree * /*tree*/)
    		fChain_selected->SetBranchAddress("LHE_dphill", &s_LHE_dphill);
    		fChain_selected->SetBranchAddress("LHE_dphilmet1", &s_LHE_dphilmet1);
    		fChain_selected->SetBranchAddress("LHE_dphilmet2", &s_LHE_dphilmet2);
+         fChain_selected->SetBranchAddress("LHE_mjj", &s_LHE_mjj);
+         fChain_selected->SetBranchAddress("LHE_theta_jj", &s_LHE_theta_jj);
+
 
    		fChain_selected->SetBranchStatus("*", 0);                              //Attivo solo i Branches che mi interessano
-   		fChain_selected->SetBranchStatus("std_vector_LHElepton_pt", 1);
+         fChain_selected->SetBranchStatus("std_vector_LHElepton_pt", 1);
+   		fChain_selected->SetBranchStatus("std_vector_LHEparton_pt", 1);
    		fChain_selected->SetBranchStatus("metLHEpt", 1);
    		fChain_selected->SetBranchStatus("LHE_mlvlv", 1);
    		fChain_selected->SetBranchStatus("LHE_mlvlv_t", 1);
@@ -100,7 +111,9 @@ void myselector::Begin(TTree * /*tree*/)
    		fChain_selected->SetBranchStatus("LHE_theta", 1);
    		fChain_selected->SetBranchStatus("LHE_dphill", 1);
    		fChain_selected->SetBranchStatus("LHE_dphilmet1", 1);
-   		fChain_selected->SetBranchStatus("LHE_dphilmet2", 1);
+         fChain_selected->SetBranchStatus("LHE_dphilmet2", 1);
+         fChain_selected->SetBranchStatus("LHE_mjj", 1);
+   		fChain_selected->SetBranchStatus("LHE_theta_jj", 1);
    		//fChain_selected->Print();
    }
    else {
@@ -223,6 +236,7 @@ Bool_t myselector::Process(Long64_t entry)
    LHE_dphilmet1 = p_lepton1_t.Angle(p_met.Vect());
    LHE_dphilmet2 = p_lepton2_t.Angle(p_met.Vect());
    LHE_mll = p_ll.M();
+   LHE_theta_jj = p_parton1.Angle(p_parton2.Vect());   //Angolo tra i due partoni
 
    Bool_t selection = 1;
    if(opzioni[0] == "raw") {
@@ -535,7 +549,8 @@ void myselector::Terminate()
    		newtree->Print();
    		treefile->Write();
       treefile->Delete("latino;1");
-   		std::cout << "Lista dei contenuti del file WpWmJJ_reduced.root:" << std::endl;
+         //std::cout << "Lista dei contenuti del file WpWmJJ_reduced.root:" << std::endl;
+   		std::cout << "Lista dei contenuti del file WpWmJJ_reduced2.root:" << std::endl;
    		treefile->ls();
    		delete treefile;
    }
