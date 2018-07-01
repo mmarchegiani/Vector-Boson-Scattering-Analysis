@@ -99,13 +99,13 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    //reader->AddVariable( "2*LHE_mlvlv_t" , &LHE_mlvlv_tx2);
    reader->AddVariable( "LHE_mllmet" , &LHE_mllmet);
    //reader->AddVariable( "1.354*LHE_mllmet" , &LHE_mllmet_norm);
-   //reader->AddVariable( "LHE_mll" , &LHE_mll);
+   reader->AddVariable( "LHE_mll" , &LHE_mll);
    //reader->AddVariable( "2*LHE_mll" , &LHE_mllx2);
    //reader->AddVariable( "4*LHE_mll" , &LHE_mllx4);
    //reader->AddVariable( "metLHEpt" , &metLHEpt);
    //reader->AddVariable( "2*metLHEpt" , &metLHEptx2);
-   //reader->AddVariable( "std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1);
-   reader->AddVariable( "2*std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1x2);
+   reader->AddVariable( "std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1);
+   //reader->AddVariable( "2*std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1x2);
    //reader->AddVariable( "std_vector_LHElepton_pt[1]" , &std_vector_LHElepton_pt2);
    //reader->AddVariable( "4*std_vector_LHElepton_pt[1]" , &std_vector_LHElepton_pt2x4);
    //reader->AddVariable( "LHE_theta*LHE_mll" , &LHE_thetaxLHE_mll);
@@ -138,7 +138,10 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}", "p_{T, MET}"};		// #14
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}"};		// #15
    //TString variable_name[20] = {"M_{ll, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #16
-   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*p_{T, lepton1}"};		// #17
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*p_{T, lepton1}"};		// #17
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}"};				// #18-19-20-21
+   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, lepton1}"};				// #22
+
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    TString target_name = "M_{l#nul#nu}";

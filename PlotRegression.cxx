@@ -68,8 +68,9 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}", "p_{T, MET}"};      // #14
    //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}"};      // #15
    //TString variable_name[20] = {"M_{ll, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};      // #16
-   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*p_{T, lepton1}"};      // #17
-
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*p_{T, lepton1}"};      // #17
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}"};              // #18-19-20-21
+   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, lepton1}"};          // #22
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,6 +97,7 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    TH1F* h_dev = new TH1F( "(" + target_name[2] + "-" + target_name[1] + ") : " + target_name[1], "Deviation from target | " + TrainName, 2*devbins, -2., 2.);
    TH1F* h_resolution = new TH1F( "Resolution", target_name[2] + " : " + target_name[1], devbins, 0., 5.);
    TH1F* h_resolution_mllmet = new TH1F( "Visible resolution", "A*M_{ll, MET} : " + target_name[1], devbins, 0., 5.);
+   TH1F* h_mllmet = new TH1F( "Visible mass", "M_{ll, MET} | M_{l#nul#nu} > 400 GeV", mbins, 0., 1500.);
    TProfile* h_profile = new TProfile("Dev profile", "Profile of " + target_name[2] + " deviation vs " + target_name[1], mbins, 0., 1500., -3., 3.);
 
    //Definisco due TH2F per ogni variabile:
@@ -219,6 +221,8 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       //if(LHE_mlvlv > 400.)
       h_resolution->Fill(REG_mlvlv/LHE_mlvlv);
       h_resolution_mllmet->Fill(A*LHE_mllmet/LHE_mlvlv);
+      if(LHE_mlvlv > 400.)
+         h_mllmet->Fill(LHE_mllmet);
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll};                                     // #1
@@ -237,7 +241,10 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
       //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_thetaxLHE_mll, metLHEpt};        // #14
       //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_thetaxLHE_mll};        // #15
       //Float_t y_plots[20] = {LHE_mllmet, std_vector_LHElepton_pt1x2, std_vector_LHElepton_pt2x4};        // #16
-      Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, std_vector_LHElepton_pt1x2};        // #17
+      //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, std_vector_LHElepton_pt1x2};        // #17
+      //Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt};                           // #18-19-20-21
+      Float_t y_plots[20] = {LHE_mlvlv_t, LHE_mllmet, LHE_mll, std_vector_LHElepton_pt->at(0)};       // #22
+
 
 
 
@@ -281,6 +288,13 @@ void PlotRegression( TString TrainName = "", TString SubName = "" )
    legend2->AddEntry((TObject*)0, "A = 1.35362", "");
    legend2->Draw();
    d->Print(path + "resolution_visible.png");
+
+   TCanvas* f = new TCanvas ("f0", "f0", 1196, 690);
+   h_mllmet->GetXaxis()->SetTitle("M_{ll, MET} [GeV]");
+   h_mllmet->GetYaxis()->SetTitle("N");
+   h_mllmet->SetLineColor(kBlue);
+   h_mllmet->Draw();
+   f->Print(path + "histo_mllmet.png");
 
    c[0] = new TCanvas ("c0", "c0", 1196, 690);
    h_regression->GetXaxis()->SetTitle(target_name[0] + " [GeV]");
