@@ -1,0 +1,157 @@
+// Script per Test_methods
+//
+# !/bin/sh
+# Script per lanciare più volte la regression, applicarla e plottare i risultati.
+# Il primo argomento indica il numero di trees (NTrees) per la BDT.
+
+#root -l TrainRegression_mlp.cxx\(\"100\"\,\"TMVAReg100.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"200\"\,\"TMVAReg200.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"400\"\,\"TMVAReg400.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"800\"\,\"TMVAReg800.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"1600\"\,\"TMVAReg1600.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"2000\"\,\"TMVAReg2000.root\"\)
+#root -l TrainRegression_mlp.cxx\(\"3200\"\,\"TMVAReg3200.root\"\)
+
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"100\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"200\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"400\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"800\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"1600\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"2000\"\)
+#root -l -q ApplyRegression.cxx\(\"BDTG\"\,\"3200\"\)
+
+touch target_deviation.txt
+echo "Method	NTrees	Deviation	RMS" > target_deviation.txt
+
+root -l -q PlotRegression.cxx\(\"BDTG2\"\,\"100\"\)
+root -l -q PlotRegression.cxx\(\"BDTG2\"\,\"200\"\)
+root -l -q PlotRegression.cxx\(\"BDTG2\"\,\"400\"\)
+root -l -q PlotRegression.cxx\(\"BDTG2\"\,\"800\"\)
+root -l -q PlotRegression.cxx\(\"BDTG2\"\,\"1600\"\)
+
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"100\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"200\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"400\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"800\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"1600\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"2000\"\)
+root -l -q PlotRegression.cxx\(\"BDTG3\"\,\"3200\"\)
+
+echo "Controllo plots..."
+sleep 2
+#ls -la BDT_AdaBoost/dataset_*/plots/
+#ls -la BDT_Grad/dataset_*/plots/
+#ls -la BDT_Grad_nocuts/dataset_*/plots/
+ls -la BDT_Grad_MaxDepth10/dataset_*/plots/
+
+echo "Target deviation:"
+cat target_deviation.txt
+
+// Comandi per plottare Shrinkage
+//
+root -l -q regression.cxx\(\"0.05\"\)
+root -l -q regression.cxx\(\"0.06\"\)
+root -l -q regression.cxx\(\"0.07\"\)
+root -l -q regression.cxx\(\"0.08\"\)
+root -l -q regression.cxx\(\"0.09\"\)
+root -l -q regression.cxx\(\"0.1\"\)
+root -l -q regression.cxx\(\"0.11\"\)
+root -l -q regression.cxx\(\"0.12\"\)
+root -l -q regression.cxx\(\"0.13\"\)
+root -l -q regression.cxx\(\"0.14\"\)
+root -l -q regression.cxx\(\"0.15\"\)
+root -l -q regression.cxx\(\"0.16\"\)
+root -l -q regression.cxx\(\"0.17\"\)
+root -l -q regression.cxx\(\"0.18\"\)
+root -l -q regression.cxx\(\"0.19\"\)
+root -l -q regression.cxx\(\"0.2\"\)
+root -l -q regression.cxx\(\"0.3\"\)
+root -l -q regression.cxx\(\"0.4\"\)
+root -l -q regression.cxx\(\"0.5\"\)
+root -l -q regression.cxx\(\"0.6\"\)
+root -l -q regression.cxx\(\"0.7\"\)
+root -l -q regression.cxx\(\"0.8\"\)
+root -l -q regression.cxx\(\"0.9\"\)
+root -l -q regression.cxx\(\"1.0\"\)
+
+// Comandi per plottare Fraction
+//
+root -l -q regression.cxx\(\"0.05\"\)
+root -l -q regression.cxx\(\"0.1\"\)
+root -l -q regression.cxx\(\"0.15\"\)
+root -l -q regression.cxx\(\"0.2\"\)
+root -l -q regression.cxx\(\"0.25\"\)
+root -l -q regression.cxx\(\"0.3\"\)
+root -l -q regression.cxx\(\"0.35\"\)
+root -l -q regression.cxx\(\"0.4\"\)
+root -l -q regression.cxx\(\"0.45\"\)
+root -l -q regression.cxx\(\"0.5\"\)
+root -l -q regression.cxx\(\"0.55\"\)
+root -l -q regression.cxx\(\"0.6\"\)
+root -l -q regression.cxx\(\"0.65\"\)
+root -l -q regression.cxx\(\"0.7\"\)
+root -l -q regression.cxx\(\"0.75\"\)
+root -l -q regression.cxx\(\"0.8\"\)
+root -l -q regression.cxx\(\"0.85\"\)
+root -l -q regression.cxx\(\"0.9\"\)
+root -l -q regression.cxx\(\"0.95\"\)
+root -l -q regression.cxx\(\"1.0\"\)
+
+// Comandi per plottare NTrees
+//
+root -l -q regression.cxx\(\"50\"\)
+root -l -q regression.cxx\(\"100\"\)
+root -l -q regression.cxx\(\"200\"\)
+root -l -q regression.cxx\(\"300\"\)
+root -l -q regression.cxx\(\"400\"\)
+root -l -q regression.cxx\(\"500\"\)
+root -l -q regression.cxx\(\"600\"\)
+root -l -q regression.cxx\(\"700\"\)
+root -l -q regression.cxx\(\"800\"\)
+root -l -q regression.cxx\(\"900\"\)
+root -l -q regression.cxx\(\"1000\"\)
+root -l -q regression.cxx\(\"1100\"\)
+root -l -q regression.cxx\(\"1200\"\)
+root -l -q regression.cxx\(\"1300\"\)
+root -l -q regression.cxx\(\"1400\"\)
+root -l -q regression.cxx\(\"1500\"\)
+root -l -q regression.cxx\(\"1600\"\)
+root -l -q regression.cxx\(\"1700\"\)
+root -l -q regression.cxx\(\"1800\"\)
+root -l -q regression.cxx\(\"1900\"\)
+root -l -q regression.cxx\(\"2000\"\)
+root -l -q regression.cxx\(\"2100\"\)
+root -l -q regression.cxx\(\"2200\"\)
+root -l -q regression.cxx\(\"2300\"\)
+root -l -q regression.cxx\(\"2400\"\)
+
+// Comandi per plottare MaxDepth
+//
+root -l -q regression.cxx\(\"1\"\)
+root -l -q regression.cxx\(\"2\"\)
+root -l -q regression.cxx\(\"3\"\)
+root -l -q regression.cxx\(\"4\"\)
+root -l -q regression.cxx\(\"5\"\)
+root -l -q regression.cxx\(\"6\"\)
+root -l -q regression.cxx\(\"7\"\)
+root -l -q regression.cxx\(\"8\"\)
+
+// Regressione
+//
+#1:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_mll
+#2:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt
+#3:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt
+#4:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, 2*LHE_mll, metLHEpt
+#5:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, 4*LHE_mll, metLHEpt
+#6:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, 2*metLHEpt
+#7:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt, std_vector_LHElepton_pt[0]
+#8:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0]
+#9:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0], std_vector_LHElepton_pt[1]
+#10:	W+W-	  2*LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0], 4*std_vector_LHElepton_pt[1]
+#11:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0], 4*std_vector_LHElepton_pt[1]
+#12:	W+W-	  LHE_mlvlv_t, 1.354*LHE_mllmet, LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0], 4*std_vector_LHElepton_pt[1]
+#13:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_theta*LHE_mll, metLHEpt, 2*std_vector_LHElepton_pt[0], 4*std_vector_LHElepton_pt[1]
+#14:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_theta*LHE_mll, metLHEpt
+#15:	W+W-	  LHE_mlvlv_t, LHE_mllmet, LHE_theta*LHE_mll
+#16:	W+W-	  LHE_mllmet, 2*std_vector_LHElepton_pt[0], 4*std_vector_LHElepton_pt[1]
+#17:	W+W-	  LHE_mlvlv_t, LHE_mllmet, 2*std_vector_LHElepton_pt[0]
