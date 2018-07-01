@@ -43,8 +43,8 @@ using namespace TMVA;
 // MaxDepth = 3
 
 void regression(int Opt) {
-	//TString subname = TrainRegression_bdtg("800", "0.13", "0.85", "3", Opt);
-	TString subname = "7";
+	TString subname = TrainRegression_bdtg("800", "0.13", "0.85", "3", Opt);
+	//TString subname = "17";
 	ApplyRegression("BDTG", subname, Opt);
 	PlotRegression("", subname);
 	Overtrain("", subname);

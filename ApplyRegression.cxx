@@ -86,24 +86,29 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    			LHE_theta, LHE_dphill, LHE_dphilmet1, LHE_dphilmet2, LHE_dphillxLHE_mll, LHE_dphilmet1xLHE_mll, LHE_dphilmet2xLHE_mll,
    			LHE_mlvlv_tx2, LHE_mllx2, LHE_mllx4, metLHEptx2;
 
-   Float_t std_vector_LHElepton_pt1;
-   //Float_t std_vector_LHElepton_pt2;
+   Float_t std_vector_LHElepton_pt1, std_vector_LHElepton_pt1x2;
+   Float_t std_vector_LHElepton_pt2, std_vector_LHElepton_pt2x4;
+   Float_t LHE_mllmet_norm, LHE_thetaxLHE_mll;
+   vector<float> *std_vector_LHElepton_pt = new std::vector <float>;
 
    // Target
    Float_t LHE_mlvlv;
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-   //reader->AddVariable( "LHE_mlvlv_t" , &LHE_mlvlv_t);
-   reader->AddVariable( "2*LHE_mlvlv_t" , &LHE_mlvlv_tx2);
+   reader->AddVariable( "LHE_mlvlv_t" , &LHE_mlvlv_t);
+   //reader->AddVariable( "2*LHE_mlvlv_t" , &LHE_mlvlv_tx2);
    reader->AddVariable( "LHE_mllmet" , &LHE_mllmet);
-   reader->AddVariable( "LHE_mll" , &LHE_mll);
+   //reader->AddVariable( "1.354*LHE_mllmet" , &LHE_mllmet_norm);
+   //reader->AddVariable( "LHE_mll" , &LHE_mll);
    //reader->AddVariable( "2*LHE_mll" , &LHE_mllx2);
    //reader->AddVariable( "4*LHE_mll" , &LHE_mllx4);
-   reader->AddVariable( "metLHEpt" , &metLHEpt);
+   //reader->AddVariable( "metLHEpt" , &metLHEpt);
    //reader->AddVariable( "2*metLHEpt" , &metLHEptx2);
-   reader->AddVariable( "std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1);
+   //reader->AddVariable( "std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1);
+   reader->AddVariable( "2*std_vector_LHElepton_pt[0]" , &std_vector_LHElepton_pt1x2);
    //reader->AddVariable( "std_vector_LHElepton_pt[1]" , &std_vector_LHElepton_pt2);
-   //reader->AddVariable( "LHE_theta" , &LHE_theta);
+   //reader->AddVariable( "4*std_vector_LHElepton_pt[1]" , &std_vector_LHElepton_pt2x4);
+   //reader->AddVariable( "LHE_theta*LHE_mll" , &LHE_thetaxLHE_mll);
    //reader->AddVariable( "LHE_dphill" , &LHE_dphill);
    //reader->AddVariable( "LHE_dphill*LHE_mll" , &LHE_dphillxLHE_mll);
    //reader->AddVariable( "dphillmet" , 'F'); 
@@ -123,10 +128,18 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*M_{ll}", "p_{T, MET}"};			// #4
    //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "4*M_{ll}", "p_{T, MET}"};			// #5
    //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "2*p_{T, MET}"};			// #6
-   TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "p_{T, lepton1}"};			// #7
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "p_{T, lepton1}"};			// #7
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}"};			// #8
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}", "p_{T, lepton2}"};		// #9
+   //TString variable_name[20] = {"2*M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #10
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #11
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "1.354*M_{ll, MET}", "M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #12
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}", "p_{T, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #13
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}", "p_{T, MET}"};		// #14
+   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "#Delta#theta*M_{ll}"};		// #15
+   //TString variable_name[20] = {"M_{ll, MET}", "2*p_{T, lepton1}", "4*p_{T, lepton2}"};		// #16
+   TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "2*p_{T, lepton1}"};		// #17
 
-   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "#Delta#phi_{ll}M_{ll}"};
-   //TString variable_name[20] = {"M^{T}_{l#nul#nu}", "M_{ll, MET}", "M_{ll}", "p^{T}_{l1}"};
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    TString target_name = "M_{l#nul#nu}";
    Int_t nvariables = 0;
@@ -208,7 +221,6 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    TFile *target  = new TFile( path + "TMVARegApp" + SubName + ".root","RECREATE" );
    TTree *newtree = theTree->CloneTree();
    newtree->SetName("latino_reg");
-   vector<float> std_vector_LHElepton_pt;
    std::cout << "--- Select signal sample" << std::endl;
 
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,8 +229,8 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    newtree->SetBranchAddress("LHE_mllmet", &LHE_mllmet);
    newtree->SetBranchAddress("LHE_mll", &LHE_mll);
    newtree->SetBranchAddress("metLHEpt", &metLHEpt);
-   newtree->SetBranchAddress("std_vector_LHElepton_pt", &std_vector_LHElepton_pt[0]);
-   //newtree->SetBranchAddress("LHE_theta", &LHE_theta);
+   newtree->SetBranchAddress("std_vector_LHElepton_pt", &std_vector_LHElepton_pt);
+   newtree->SetBranchAddress("LHE_theta", &LHE_theta);
    //newtree->SetBranchAddress("LHE_dphill", &LHE_dphill);
    //newtree->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1);
    //newtree->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2);
@@ -241,8 +253,17 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
    TBranch *b_metLHEptx2 = newtree->Branch("metLHEptx2", &metLHEptx2, "metLHEptx2/F");
    newtree->SetBranchAddress("metLHEptx2", &metLHEptx2);
 
-//   TBranch *b_LHE_dphillxLHE_mll = newtree->Branch("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll, "LHE_dphillxLHE_mll/F");
-//   newtree->SetBranchAddress("LHE_dphillxLHE_mll", &LHE_dphillxLHE_mll);
+   TBranch *b_std_vector_LHElepton_pt1x2 = newtree->Branch("std_vector_LHElepton_pt1x2", &std_vector_LHElepton_pt1x2, "std_vector_LHElepton_pt1x2/F");
+   newtree->SetBranchAddress("std_vector_LHElepton_pt1x2", &std_vector_LHElepton_pt1x2);
+
+   TBranch *b_std_vector_LHElepton_pt2x4 = newtree->Branch("std_vector_LHElepton_pt2x4", &std_vector_LHElepton_pt2x4, "std_vector_LHElepton_pt2x4/F");
+   newtree->SetBranchAddress("std_vector_LHElepton_pt2x4", &std_vector_LHElepton_pt2x4);
+
+   TBranch *b_LHE_mllmet_norm = newtree->Branch("LHE_mllmet_norm", &LHE_mllmet_norm, "LHE_mllmet_norm/F");
+   newtree->SetBranchAddress("LHE_mllmet_norm", &LHE_mllmet_norm);
+
+   TBranch *b_LHE_thetaxLHE_mll = newtree->Branch("LHE_thetaxLHE_mll", &LHE_thetaxLHE_mll, "LHE_thetaxLHE_mll/F");
+   newtree->SetBranchAddress("LHE_thetaxLHE_mll", &LHE_thetaxLHE_mll);
    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    std::cout << "--- Processing: " << newtree->GetEntries() << " events" << std::endl;
@@ -273,6 +294,18 @@ void ApplyRegression( TString myMethodList = "BDT", TString SubName = "", int Op
 
          metLHEptx2 = 2*metLHEpt;
          b_metLHEptx2->Fill();
+
+         std_vector_LHElepton_pt1x2 = 2*std_vector_LHElepton_pt->at(0);
+         b_std_vector_LHElepton_pt1x2->Fill();
+
+         std_vector_LHElepton_pt2x4 = 4*std_vector_LHElepton_pt->at(1);
+         b_std_vector_LHElepton_pt2x4->Fill();
+
+         LHE_mllmet_norm = 1.354*LHE_mllmet;
+         b_LHE_mllmet_norm->Fill();
+
+         LHE_thetaxLHE_mll = LHE_theta*LHE_mll;
+         b_LHE_thetaxLHE_mll->Fill();
 
 //         LHE_dphillxLHE_mll = LHE_dphill*LHE_mll;
 //         b_LHE_dphillxLHE_mll->Fill();
