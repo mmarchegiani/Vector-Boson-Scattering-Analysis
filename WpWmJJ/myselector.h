@@ -90,6 +90,10 @@ public :
    TH2F *          _histo2_dphilmet1_mlvlv;
    TH2F *          _histo2_dphilmet2_mlvlv;
    TH2F *          _histo2_dphillxmll_mlvlv;
+   TH2F *          _histo2_mjj_mlvlv;
+   TH2F *          _histo2_thetajjxmjj_mlvlv;
+   TH2F *          _histo2_parton1_pt_mlvlv;
+   TH2F *          _histo2_parton2_pt_mlvlv;
 
    vector<float>   *s_std_vector_LHElepton_pt;     //definisco le variabili di fChain_selected
    vector<float>   *s_std_vector_LHEparton_pt;

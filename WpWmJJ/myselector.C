@@ -43,7 +43,23 @@ void myselector::Begin(TTree * /*tree*/)
    // When running with PROOF Begin() is only called on the client.
    // The tree argument is deprecated (on PROOF 0 is passed).
 
-   if(opzioni[2] = "tree") {
+   TString option = GetOption();
+   TObjArray *buffer = option.Tokenize(" ");
+   int i = 0;
+   while(i < buffer->GetEntries()) {
+          opzioni[i] = ((TObjString*)(buffer->At(i)))->String();
+       //std::cout << i << "\t" << opzioni[i] << std::endl;
+       i++;
+   }
+   
+   if(opzioni[0] == "selection")
+         dir = "Selection/";
+   if(opzioni[0] == "raw")
+         dir = "Raw/";
+   if(opzioni[0] == "test")
+          dir = "Test/";
+
+   if(opzioni[2] == "tree") {
       fChain = latino;
       //treefile = new TFile("WpWmJJ_reduced.root", "update");
       treefile = new TFile("WpWmJJ_reduced2.root", "update");
@@ -71,6 +87,7 @@ void myselector::Begin(TTree * /*tree*/)
    		b_LHE_dphilmet1 = fChain->Branch("LHE_dphilmet1", &LHE_dphilmet1, "LHE_dphilmet1/F");
    		b_LHE_dphilmet2 = fChain->Branch("LHE_dphilmet2", &LHE_dphilmet2, "LHE_dphilmet2/F");
          b_LHE_mjj = fChain->Branch("LHE_mjj", &LHE_mjj, "LHE_mjj/F");
+         b_LHE_theta_jj = fChain->Branch("LHE_theta_jj", &LHE_theta_jj, "LHE_theta_jj/F");
 
 		  fChain->SetBranchAddress("LHE_mlvlv", &LHE_mlvlv, &b_LHE_mlvlv);           //Branches aggiunti da me
    		fChain->SetBranchAddress("LHE_mlvlv_t", &LHE_mlvlv_t, &b_LHE_mlvlv_t);
@@ -80,7 +97,7 @@ void myselector::Begin(TTree * /*tree*/)
    		fChain->SetBranchAddress("LHE_dphill", &LHE_dphill, &b_LHE_dphill);
    		fChain->SetBranchAddress("LHE_dphilmet1", &LHE_dphilmet1, &b_LHE_dphilmet1);
          fChain->SetBranchAddress("LHE_dphilmet2", &LHE_dphilmet2, &b_LHE_dphilmet2);
-   		fChain->SetBranchAddress("LHE_mjj", &LHE_mjj, &LHE_mjj);
+   		fChain->SetBranchAddress("LHE_mjj", &LHE_mjj, &b_LHE_mjj);
          fChain->SetBranchAddress("LHE_theta_jj", &LHE_theta_jj, &b_LHE_theta_jj);
 
    		fChain_selected = fChain->CloneTree(0);
@@ -141,24 +158,13 @@ void myselector::Begin(TTree * /*tree*/)
    		_histo2_dphill_mlvlv = new TH2F ("#Delta#phi_{ll} vs M_{l#nul#nu}", "#Delta#phi_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
    		_histo2_dphilmet1_mlvlv = new TH2F ("#Delta#phi_{l1,MET} vs M_{l#nul#nu}", "#Delta#phi_{l1,MET} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
    		_histo2_dphilmet2_mlvlv = new TH2F ("#Delta#phi_{l2,MET} vs M_{l#nul#nu}", "#Delta#phi_{l2,MET} vs M_{l#nul#nu}", mbins, 0., 1500., phibins, 0., 3.15);
-   		_histo2_dphillxmll_mlvlv = new TH2F ("#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", "#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 2000.);
-   }
+         _histo2_dphillxmll_mlvlv = new TH2F ("#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", "#Delta#phi_{ll} M_{ll} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 2000.);
+         _histo2_mjj_mlvlv = new TH2F ("M_{jet-jet} vs M_{l#nul#nu}", "M_{jet-jet} vs M_{l#nul#nu}", mbins, 0., 1500., mbins, 0., 3000.);
+   		_histo2_thetajjxmjj_mlvlv = new TH2F ("#theta_{jet-jet} M_{jet-jet} vs M_{l#nul#nu}", "#theta_{jet-jet} M_{jet-jet} vs M_{l#nul#nu}", mbins, 0., 1500., mbins, 0., 3000.);
+         _histo2_parton1_pt_mlvlv = new TH2F ("p_{T, parton1} vs M_{l#nul#nu}", "p_{T, parton1} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
+         _histo2_parton2_pt_mlvlv = new TH2F ("p_{T, parton2} vs M_{l#nul#nu}", "p_{T, parton2} vs M_{l#nul#nu}", mbins, 0., 1500., ptbins, 0., 800.);
 
-   TString option = GetOption();
-   TObjArray *buffer = option.Tokenize(" ");
-   int i = 0;
-   while(i < buffer->GetEntries()) {
-   		 opzioni[i] = ((TObjString*)(buffer->At(i)))->String();
-		 //std::cout << i << "\t" << opzioni[i] << std::endl;
-		 i++;
-	}
-   
-   if(opzioni[0] == "selection")
-         dir = "Selection/";
-   if(opzioni[0] == "raw")
-         dir = "Raw/";
-   if(opzioni[0] == "test")
-   		 dir = "Test/";
+   }
    
 }
 
@@ -286,6 +292,10 @@ Bool_t myselector::Process(Long64_t entry)
       		_histo2_dphilmet1_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet1);
       		_histo2_dphilmet2_mlvlv->Fill(LHE_mlvlv, LHE_dphilmet2);
       		_histo2_dphillxmll_mlvlv->Fill(LHE_mlvlv, LHE_dphill*LHE_mll);
+            _histo2_mjj_mlvlv->Fill(LHE_mlvlv, LHE_mjj);
+            _histo2_thetajjxmjj_mlvlv->Fill(LHE_mlvlv, LHE_theta_jj*LHE_mjj);
+            _histo2_parton1_pt_mlvlv->Fill(LHE_mlvlv, p_parton1.Pt());
+            _histo2_parton2_pt_mlvlv->Fill(LHE_mlvlv, p_parton2.Pt());
 
    	  		//outfile <<  LHE_mlvlv << "\t" << LHE_mlvlv_t << "\t" << LHE_mllmet << "\t" << LHE_mll;	//Salvo in un file di testo le variabili interessanti
       		//outfile << LHE_theta << "\t" << LHE_dphill << "\t" << LHE_dphilmet1 << "\t" << LHE_dphilmet2 << endl;
@@ -468,6 +478,26 @@ void myselector::Terminate()
    		_histo2_dphillxmll_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{ll} M_{ll} [GeV]");
    		_histo2_dphillxmll_mlvlv->Draw(draw_option);
 
+         TCanvas* c16 = new TCanvas ("c16", "c16", 1200, 800);
+         _histo2_mjj_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+         _histo2_mjj_mlvlv->GetYaxis()->SetTitle("M_{jet-jet} [GeV]");
+         _histo2_mjj_mlvlv->Draw(draw_option);
+
+         TCanvas* c17 = new TCanvas ("c17", "c17", 1200, 800);
+         _histo2_thetajjxmjj_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+         _histo2_thetajjxmjj_mlvlv->GetYaxis()->SetTitle("#theta_{jet-jet} M_{jet-jet} [GeV]");
+         _histo2_thetajjxmjj_mlvlv->Draw(draw_option);
+
+         TCanvas* c18 = new TCanvas ("c18", "c18", 1200, 800);
+         _histo2_parton1_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+         _histo2_parton1_pt_mlvlv->GetYaxis()->SetTitle("p_{T, parton1} [GeV] [GeV]");
+         _histo2_parton1_pt_mlvlv->Draw(draw_option);
+
+         TCanvas* c18_bis = new TCanvas ("c18_bis", "c18_bis", 1200, 800);
+         _histo2_parton2_pt_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
+         _histo2_parton2_pt_mlvlv->GetYaxis()->SetTitle("p_{T, parton2} [GeV] [GeV]");
+         _histo2_parton2_pt_mlvlv->Draw(draw_option);
+
    		if(entries > 20000 && opzioni[0] == "selection") {
    			c7->Print("Correlations/pt_lepton1_vs_mlvlv.png");		
    			c7_bis->Print("Correlations/pt_lepton2_vs_mlvlv.png");		
@@ -476,6 +506,10 @@ void myselector::Terminate()
    			c10->Print("Correlations/mllmet_vs_mlvlv.png");
    			c11->Print("Correlations/mll_vs_mlvlv.png");
    			c15->Print("Correlations/dphillxmll_vs_mlvlv.png");
+            c16->Print("Correlations/mjj_vs_mlvlv.png");
+            c17->Print("Correlations/thetajjxmjj_vs_mlvlv.png");
+            c18->Print("Correlations/pt_parton1_vs_mlvlv.png");
+            c18_bis->Print("Correlations/pt_parton2_vs_mlvlv.png");
    		}
 
    		th1Style->SetStatX(0.88);
@@ -501,6 +535,8 @@ void myselector::Terminate()
    		_histo2_dphilmet2_mlvlv->GetXaxis()->SetTitle("M_{l#nul#nu} [GeV]");
    		_histo2_dphilmet2_mlvlv->GetYaxis()->SetTitle("#Delta#phi_{l2,MET} [rad]");
    		_histo2_dphilmet2_mlvlv->Draw(draw_option);
+
+         
    
    		if(entries > 20000 && opzioni[0] == "selection") {
 	   		c12->Print("Correlations/theta_vs_mlvlv.png");
@@ -522,7 +558,11 @@ void myselector::Terminate()
    		std::cout << "dphill\t\t" << _histo2_dphill_mlvlv->GetCorrelationFactor() << std::endl;
    		std::cout << "dphilmet1\t" << _histo2_dphilmet1_mlvlv->GetCorrelationFactor() << std::endl;
    		std::cout << "dphilmet2\t" << _histo2_dphilmet2_mlvlv->GetCorrelationFactor() << std::endl;
-   		std::cout << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << std::endl;
+         std::cout << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << std::endl;
+         std::cout << "mjj\t" << _histo2_mjj_mlvlv->GetCorrelationFactor() << std::endl;
+         std::cout << "thetajj*mjj\t" << _histo2_thetajjxmjj_mlvlv->GetCorrelationFactor() << std::endl;
+         std::cout << "pt_parton1\t" << _histo2_parton1_pt_mlvlv->GetCorrelationFactor() << std::endl;
+   		std::cout << "pt_parton2\t" << _histo2_parton2_pt_mlvlv->GetCorrelationFactor() << std::endl;
 
    		output << "variable\tcorrelation factor" << endl;
    		output << "pt_lepton1\t" << _histo2_lepton1_pt_mlvlv->GetCorrelationFactor() << endl;
@@ -536,6 +576,10 @@ void myselector::Terminate()
    		output << "dphilmet1\t" << _histo2_dphilmet1_mlvlv->GetCorrelationFactor() << endl;
    		output << "dphilmet2\t" << _histo2_dphilmet2_mlvlv->GetCorrelationFactor() << endl;
    		output << "dphill*mll\t" << _histo2_dphillxmll_mlvlv->GetCorrelationFactor() << endl;
+         output << "mjj\t" << _histo2_mjj_mlvlv->GetCorrelationFactor() << endl;
+         output << "thetajj*mjj\t" << _histo2_thetajjxmjj_mlvlv->GetCorrelationFactor() << endl;
+         output << "pt_parton1\t" << _histo2_parton1_pt_mlvlv->GetCorrelationFactor() << endl;
+         output << "pt_parton2\t" << _histo2_parton2_pt_mlvlv->GetCorrelationFactor() << endl;
 
    		output.close();
    		//outfile.close();

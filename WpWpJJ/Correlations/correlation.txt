@@ -10,3 +10,7 @@ dphill		0.215251
 dphilmet1	-0.00738185
 dphilmet2	-0.193976
 dphill*mll	0.561934
+mjj	0.136323
+thetajj*mjj	0.0795813
+pt_parton1	0.204146
+pt_parton2	0.0500505
